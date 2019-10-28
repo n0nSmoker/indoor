@@ -154,7 +154,7 @@ def test_user_by_id(client, add_user):
 def test_update_user(client, add_user):
     user = add_user()
     new_name = 'GHJKJHGHJKJHJK123NNAAME'
-    resp = client.put(  
+    resp = client.put(
         endpoint=f'{module_name}s.update_{module_name}_view',
         user_id=user.id,
         data=dict(

@@ -21,7 +21,7 @@ migrate:
 	$(COMPOSE-DEV) exec indoor flask db migrate
 
 upgrade:
-	$(COMPOSE-DEV) exec api flask db upgrade
+	$(COMPOSE-DEV) exec indoor flask db upgrade
 
 shell:
 	$(COMPOSE-DEV) exec indoor flask debug

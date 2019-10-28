@@ -1,11 +1,14 @@
-from lib.factory import create_app, create_db, create_tables, drop_db, init_app
 import pytest
+from lib.factory import create_app, create_db, create_tables, drop_db, init_app
+from lib.utils import get_random_str
 
+from app.users.models import User
 
-from .utils import Client
+from .utils import Client, db_func_fixture
 
 
 APP_NAME = 'indoor'
+
 
 @pytest.fixture(scope='session')
 def app(request):
@@ -61,4 +64,25 @@ def client(app): #noqa
 def empty_list_resp():
     return dict(results=[], total=0)
 
+
+@db_func_fixture(scope='module')
+def add_user(client):
+    def func(name=None, email=None, password=None, role=None):
+        req = dict(
+            name=name or f'User_{get_random_str()}',
+            email=email or f'{get_random_str()}@email.com',
+            password=password or get_random_str(),
+        )
+        if role:
+            req['role'] = role
+
+        resp = client.post(
+            endpoint=f'users.add_user_view',
+            data=req
+        )
+        assert 'data' in resp
+        data = resp['data']
+        assert 'id' in data
+        return User.query.filter_by(id=data['id']).one()
+    return func
 

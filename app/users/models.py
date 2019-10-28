@@ -1,11 +1,14 @@
 from datetime import datetime
+from sqlalchemy_serializer import SerializerMixin
 
 from lib.factory import db
-from sqlalchemy_serializer import SerializerMixin
+
+from .constants import STATUS_ACTIVE
 
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
+    serialize_rules = ('-password',)
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -14,7 +17,7 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String(255), unique=True, index=True, nullable=False)
 
     role = db.Column(db.String(50), index=True, nullable=False)
-    status = db.Column(db.String(50), index=True, nullable=False)
+    status = db.Column(db.String(50), index=True, nullable=False, default=STATUS_ACTIVE)
 
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)

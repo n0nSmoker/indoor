@@ -32,4 +32,3 @@ def success_response_schema(description, resp=None, is_list=False):
             }
         }
     }
-

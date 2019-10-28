@@ -7,6 +7,10 @@ USER_MODEL_NAME = 'User'
 models = {
     USER_MODEL_NAME: {
         'id': int,
+        'name': str,
+        'email': str,
+        'role': str,
+        'status': str,
         'created_at': str,
         'updated_at': str,
     },

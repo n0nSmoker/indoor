@@ -1,5 +1,7 @@
 import inspect
+import random
 import re
+import string
 
 from flask import jsonify
 from flask_sqlalchemy import Model
@@ -48,12 +50,12 @@ def find_models_and_tables():
     return models_dict
 
 
-def setattrs(obj, **kwargs):
+def setattrs(obj, ignore_nulls=False, **kwargs):
     """ Setting multiple object attributes at once """
 
     attrs = (a for a in dir(obj) if not a.startswith('_'))
     for attr in attrs:
-        if attr in kwargs:
+        if attr in kwargs and (kwargs[attr] is not None and ignore_nulls or not ignore_nulls):
             setattr(obj, attr, kwargs[attr])
 
 
@@ -79,3 +81,7 @@ def add_or_update_attr(func, param, value):
         param.update(value)
     except AttributeError:
         setattr(func, param, value)
+
+
+def get_random_str(length=10):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))

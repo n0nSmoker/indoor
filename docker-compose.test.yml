@@ -1,0 +1,19 @@
+version: '3.4'
+x-environment: &environment
+  environment:
+    - POSTGRES_DB=test_pg_host
+    - TESTING=1
+    - SERVER_NAME=127.0.0.1:5000
+    - TEST_FILE=${TEST_FILE}
+
+services:
+  indoor:
+    command:
+      - run_tests
+    depends_on:
+      - indoor-db
+    restart: "no"
+    <<: *environment
+
+  indoor-db:
+    <<: *environment

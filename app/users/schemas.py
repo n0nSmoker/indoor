@@ -1,0 +1,14 @@
+from app.common.schemas import FILTER_SCHEMA
+
+
+FILTER_USERS_SCHEMA = {
+    **FILTER_SCHEMA
+}
+
+ADD_USER_SCHEMA = {
+
+}
+
+UPDATE_USER_SCHEMA = {
+    **ADD_USER_SCHEMA
+}

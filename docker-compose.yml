@@ -1,0 +1,45 @@
+version: '3.4'
+x-env-files: &env-files
+  env_file:
+    - .env
+
+services:
+  indoor:
+    container_name: indoor
+    restart: always
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - indoor-static:/var/www/app/static/upload
+    depends_on:
+      - indoor-db
+      - indoor-redis
+    command:
+      - run
+    <<: *env-files
+
+  indoor-db:
+    container_name: indoor-db
+    image: postgres:latest
+    volumes:
+      - indoor-db:/var/lib/postgresql/data
+    <<: *env-files
+
+  indoor-redis:
+    container_name: indoor-redis
+    image: redis:latest
+    volumes:
+      - indoor-redis:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+
+
+volumes:
+  indoor-db:
+    driver: local
+  indoor-redis:
+    driver: local
+  indoor-static:
+    driver: local
+

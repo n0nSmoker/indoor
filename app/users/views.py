@@ -66,7 +66,7 @@ def update_user_view(user_id, **kwargs):
 
 @mod.route('/<int:user_id>/', methods=['DELETE'])
 def delete_user_view(user_id):
-    user = User.query.filter_by(id=user_id).one()
+    user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
     return success(**user.to_dict())

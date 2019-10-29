@@ -3,7 +3,7 @@ import pytest
 from lib.utils import get_random_str
 
 from app.users.models import User
-from app.users.constants import ROLES, ROLE_ANON
+from app.users.constants import ROLES, ROLE_ANON, ROLE_MANAGER, ROLE_ADMIN
 
 
 module_name = 'user'
@@ -151,14 +151,20 @@ def test_user_by_id(client, add_user):
     assert 'password' not in data
 
 
-def test_update_user(client, add_user):
+@pytest.mark.parametrize("name,role,email", [
+    (None, ROLE_MANAGER, f'{get_random_str()}@new.com',),
+    (f'User-{get_random_str()}', None, f'{get_random_str()}@new.com',),
+    (f'User-{get_random_str()}', ROLE_ADMIN, None,),
+])
+def test_update_user(client, add_user, name, role, email):
     user = add_user()
-    new_name = 'GHJKJHGHJKJHJK123NNAAME'
     resp = client.put(
         endpoint=f'{module_name}s.update_{module_name}_view',
         user_id=user.id,
         data=dict(
-            name=new_name,
+            name=name,
+            role=role,
+            email=email,
         )
     )
     assert 'data' in resp
@@ -169,7 +175,10 @@ def test_update_user(client, add_user):
     new_user = User.query.filter_by(id=data['id']).one_or_none()
     assert new_user
 
-    assert new_user.name == new_name
+    for var_name in ('name', 'email', 'role'):
+        val = locals()[var_name]
+        if val is not None:
+            assert getattr(user, var_name) == val
 
 
 def test_delete_user(client, add_user):
@@ -184,3 +193,13 @@ def test_delete_user(client, add_user):
     assert 'id' in data
     assert data['id'] == user.id
     assert not User.query.filter_by(id=data['id']).one_or_none()
+
+
+def test_delete_user_error(client, add_user):
+    user = add_user()
+    _ = client.delete(
+        endpoint=f'{module_name}s.delete_{module_name}_view',
+        user_id=129129129129192,
+        check_status=404
+    )
+    assert User.query.filter_by(id=user.id).one_or_none()

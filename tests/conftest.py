@@ -1,11 +1,11 @@
 import pytest
 
-from app.users.utils import get_user_by_id
+from app.users.utils import get_user_by_id, create_user
+from app.users.constants import ROLE_USER
+
 from lib.auth import AuthManager
 from lib.factory import create_app, create_db, create_tables, drop_db, init_app
 from lib.utils import get_random_str
-
-from app.users.models import User
 
 from .utils import Client, db_func_fixture
 
@@ -72,31 +72,29 @@ def empty_list_resp():
 
 @db_func_fixture(scope='module')
 def add_user(client):
-    def func(name=None, email=None, password=None, role=None, log_him_in=False):
-        req = dict(
-            name=name or f'User_{get_random_str()}',
-            email=email or f'{get_random_str()}@email.com',
-            password=password or get_random_str(),
-        )
-        if role:
-            req['role'] = role
+    def func(name=None, email=None, password=None, role=ROLE_USER, log_him_in=False, **kwargs):
+        name = name or f'User_{get_random_str()}'
+        email = email or f'{get_random_str()}@email.com'
+        password = password or get_random_str()
 
-        resp = client.post(
-            endpoint=f'users.add_user_view',
-            data=req
+        user = create_user(
+            name=name,
+            email=email,
+            password=password,
+            role=role,
+            **kwargs
         )
-        assert 'id' in resp
 
         if log_him_in:
             client.post(
                 endpoint='users.login_user_view',
                 data=dict(
-                    email=req['email'],
-                    password=req['password']
+                    email=email,
+                    password=password
                 )
             )
 
-        return User.query.filter_by(id=resp['id']).one()
+        return user
     return func
 
 
@@ -113,5 +111,3 @@ def login(app, client):
         cookie = client.get_cookies(key=app.config['AUTH_COOKIE_NAME'])
         return cookie.value  # SID
     return func
-
-

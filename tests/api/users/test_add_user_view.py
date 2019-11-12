@@ -3,14 +3,16 @@ import pytest
 from lib.utils import get_random_str
 
 from app.users.models import User
-from app.users.constants import ROLES, ROLE_USER
+from app.users.constants import ROLES, ROLE_USER, ROLE_ADMIN
 
 
 endpoint = 'users.add_user_view'
 
 
 @pytest.mark.parametrize("role", [ROLES[0][0], ROLES[1][0], ROLES[2][0]])
-def test_default(client, role):
+def test_default(client, add_user, role):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
+    
     name = f'User-{get_random_str()}'
     password = get_random_str()
     email = f'{get_random_str()}@new.com'
@@ -32,7 +34,9 @@ def test_default(client, role):
     assert instance.role == role
 
 
-def test_no_role_failure(client):
+def test_default_role(client, add_user):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
+
     name = f'User-{get_random_str()}'
     password = get_random_str()
     email = f'{get_random_str()}@new.com'
@@ -53,7 +57,23 @@ def test_no_role_failure(client):
     assert instance.role == ROLE_USER  # the default role
 
 
-def test_duplicate_email_failure(client):
+def test_not_admin_failure(client, add_user):
+    _ = add_user(role=ROLE_USER, log_him_in=True)
+
+    _ = client.post(
+        endpoint=endpoint,
+        data=dict(
+            name=f'User-{get_random_str()}',
+            password=get_random_str(),
+            email=f'{get_random_str()}@new.com',
+        ),
+        check_status=403
+    )
+
+
+def test_duplicate_email_failure(client, add_user):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
+
     name = f'User-{get_random_str()}'
     password = get_random_str()
     email = f'{get_random_str()}@new.com'
@@ -88,7 +108,9 @@ def test_duplicate_email_failure(client):
     (f'User-{get_random_str()}', None, f'{get_random_str()}@new.com',),
     (f'User-{get_random_str()}', get_random_str(), None,),
 ])
-def test_no_required_params_failure(client, name, password, email):
+def test_no_required_params_failure(client, add_user, name, password, email):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
+
     resp = client.post(
         endpoint=endpoint,
         data=dict(

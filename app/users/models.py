@@ -21,3 +21,7 @@ class User(db.Model, SerializerMixin):
 
     created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+
+
+class UserException(Exception):
+    pass

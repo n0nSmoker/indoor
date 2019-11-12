@@ -15,6 +15,8 @@ endpoint = 'users.update_user_view'
     (f'User-{get_random_str()}', ROLE_ADMIN, None,),
 ])
 def test_default(client, add_user, name, role, email):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
+
     user = add_user()
     resp = client.put(
         endpoint=endpoint,

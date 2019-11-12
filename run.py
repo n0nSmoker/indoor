@@ -85,5 +85,6 @@ def routes():
     for line in sorted(output):
         print(line)
 
+
 if __name__ == '__main__':
     app.run()

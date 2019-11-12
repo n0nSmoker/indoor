@@ -1,8 +1,11 @@
+from app.users.constants import ROLE_ADMIN
 
 endpoint = 'users.user_by_id_view'
 
 
 def test_defaut(client, add_user):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
+
     user = add_user()
     resp = client.get(
         endpoint=endpoint,

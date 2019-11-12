@@ -1,10 +1,10 @@
 ROLE_ADMIN = 'Admin'
-ROLE_ANON = 'NotAuthorized'
+ROLE_USER = 'User'
 ROLE_MANAGER = 'Manager'
 ROLES = (
     (ROLE_ADMIN, 'Администратор'),
     (ROLE_MANAGER, 'Менеджер'),
-    (ROLE_ANON, 'Аноним'),
+    (ROLE_USER, 'Пользователь'),
 )
 
 STATUS_ACTIVE = 'Active'

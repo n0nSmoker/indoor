@@ -1,9 +1,10 @@
+import hashlib
 import inspect
 import random
 import re
 import string
 
-from flask import jsonify
+from flask import jsonify, make_response
 from flask_sqlalchemy import Model
 from sqlalchemy.sql.schema import Table
 from werkzeug.utils import find_modules, import_string
@@ -59,10 +60,20 @@ def setattrs(obj, ignore_nulls=False, **kwargs):
             setattr(obj, attr, kwargs[attr])
 
 
-def success(prepared_obj=None, **kwargs):
-    resp = prepared_obj if prepared_obj is not None else kwargs
+def success(data, headers=None, cookies=None):
     status = 200
-    return jsonify(data=dict(**resp)), status
+    resp = make_response(jsonify(data), status)
+    if cookies:
+        assert isinstance(cookies, dict), 'Cookies should be a dict'
+        for n, v in cookies.items():
+            resp.set_cookie(key=n, value=v)
+
+    if headers:
+        assert isinstance(cookies, dict), 'Headers should be a dict'
+        for h, v in headers.items():
+            resp.headers[h] = v
+
+    return resp
 
 
 def fail(*, title=None, detail=None, status=400):
@@ -85,3 +96,8 @@ def add_or_update_attr(func, param, value):
 
 def get_random_str(length=10):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+
+
+def hash_password(salt, password):
+    salted = (salt + password).encode()
+    return hashlib.sha512(salted).hexdigest()

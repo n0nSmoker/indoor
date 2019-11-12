@@ -37,7 +37,7 @@ redis-cli:
 
 test:
 	if [ ! -f .env ]; then touch .env; fi;
-	TEST_FILE=$(FILE) $(COMPOSE-TEST) up --build --scale indoor-redis=0 --abort-on-container-exit
+	TEST_FILE=$(FILE) $(COMPOSE-TEST) up --build --abort-on-container-exit
 
 db:
 	$(COMPOSE-DEV) exec indoor flask db init

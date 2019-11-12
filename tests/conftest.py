@@ -1,4 +1,7 @@
 import pytest
+
+from app.users.utils import get_user_by_id
+from lib.auth import AuthManager
 from lib.factory import create_app, create_db, create_tables, drop_db, init_app
 from lib.utils import get_random_str
 
@@ -15,6 +18,8 @@ def app(request):
     """Session-wide test `Flask` application."""
     test_app = create_app(name=APP_NAME)
     init_app(test_app)
+    AuthManager(test_app, get_user_func=get_user_by_id)
+
     dsn = test_app.config['SQLALCHEMY_DATABASE_URI']
     drop_db(dsn)
     create_db(dsn)
@@ -36,7 +41,7 @@ def app(request):
 
 
 @pytest.fixture
-def session(app, request): #noqa
+def session(app, request):  #noqa
     """Creates a new database session for a test."""
     connection = app.db.engine.connect()
     transaction = connection.begin()
@@ -56,7 +61,7 @@ def session(app, request): #noqa
 
 
 @pytest.fixture(scope='session')
-def client(app): #noqa
+def client(app):  #noqa
     return Client(app=app)
 
 
@@ -67,7 +72,7 @@ def empty_list_resp():
 
 @db_func_fixture(scope='module')
 def add_user(client):
-    def func(name=None, email=None, password=None, role=None):
+    def func(name=None, email=None, password=None, role=None, log_him_in=False):
         req = dict(
             name=name or f'User_{get_random_str()}',
             email=email or f'{get_random_str()}@email.com',
@@ -80,9 +85,33 @@ def add_user(client):
             endpoint=f'users.add_user_view',
             data=req
         )
-        assert 'data' in resp
-        data = resp['data']
-        assert 'id' in data
-        return User.query.filter_by(id=data['id']).one()
+        assert 'id' in resp
+
+        if log_him_in:
+            client.post(
+                endpoint='users.login_user_view',
+                data=dict(
+                    email=req['email'],
+                    password=req['password']
+                )
+            )
+
+        return User.query.filter_by(id=resp['id']).one()
     return func
+
+
+@pytest.fixture(scope='session')
+def login(app, client):
+    def func(email, password):
+        _ = client.post(
+            endpoint='users.login_user_view',
+            data=dict(
+                email=email,
+                password=password
+            )
+        )
+        cookie = client.get_cookies(key=app.config['AUTH_COOKIE_NAME'])
+        return cookie.value  # SID
+    return func
+
 

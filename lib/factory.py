@@ -1,6 +1,7 @@
 import importlib
 import logging
 import os
+import redis
 
 from flask import Flask, Blueprint
 from furl import furl
@@ -8,7 +9,9 @@ from raven.contrib.flask import Sentry
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
+
 from lib.db import Query
+from lib.cache import RedisCache
 
 
 logger = logging.getLogger('factory')
@@ -82,11 +85,22 @@ def init_app(app, config='config.py'):
     """
     if config:
         init_config(app, config=config)
+
     app.db = init_db(app)
+    app.cache = init_cache(app)
+
     register_blueprints(app)
     init_sentry(app)
     init_migrations(app)
     return app
+
+
+def init_cache(app):
+    return RedisCache(
+        storage=redis.Redis(
+            host=app.config['REDIS_HOST'],
+            port=app.config['REDIS_PORT']
+        ))
 
 
 def create_db(dsn):

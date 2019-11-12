@@ -16,7 +16,12 @@ POSTGRES_PORT = os.environ.get("POSTGRES_PORT", '5432')
 DATABASE_URL = f'{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'
 SQLALCHEMY_DATABASE_URI = f'postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DATABASE_URL}'
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY", "WERTGbhygF#$%^&*(*&^%$EDFGBN")
 
 SERVER_NAME = os.environ.get("SERVER_NAME")
+SESSION_COOKIE_DOMAIN = SERVER_NAME
 
+REDIS_HOST = os.environ.get("REDIS_HOST", "indoor-redis")
+REDIS_PORT = os.environ.get("REDIS_PORT", 6379)
+
+AUTH_COOKIE_NAME = os.environ.get("AUTH_COOKIE_NAME", 'SID')

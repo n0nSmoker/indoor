@@ -21,7 +21,7 @@ services:
 
   indoor-db:
     container_name: indoor-db
-    image: postgres:latest
+    image: postgres:11.5
     volumes:
       - indoor-db:/var/lib/postgresql/data
     <<: *env-files

@@ -23,7 +23,7 @@ def test_defaut(client, add_user):
     assert 'password' not in resp
 
 
-def test_worng_id_failure(client, add_user):
+def test_wrong_id_failure(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     user = add_user()

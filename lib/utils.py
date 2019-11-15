@@ -36,7 +36,7 @@ class ApiException(Exception):
         self.status = status
 
     def to_result(self):
-        return fail(title=self.message, status=self.status)
+        return fail(self.message, status=self.status)
 
 
 def find_models_and_tables():
@@ -76,13 +76,16 @@ def success(data, headers=None, cookies=None):
     return resp
 
 
-def fail(*, title=None, detail=None, status=400):
-    resp = {}
-    if title:
-        resp['title'] = title
-    if detail:
-        resp['detail'] = detail
-    return jsonify(**resp), status
+def fail(msg, status=400):
+    """
+    Generates json error msg
+    :param msg: Error message(s)
+    :param status: Status code
+    :return:
+    """
+    if not isinstance(msg, list):
+        msg = [msg]
+    return make_response(jsonify(dict(errors=msg)), status)
 
 
 def add_or_update_attr(func, param, value):

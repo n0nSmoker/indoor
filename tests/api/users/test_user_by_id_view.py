@@ -21,3 +21,14 @@ def test_defaut(client, add_user):
     assert resp['role'] == user.role
 
     assert 'password' not in resp
+
+
+def test_worng_id_failure(client, add_user):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
+
+    user = add_user()
+    _ = client.get(
+        endpoint=endpoint,
+        user_id=user.id + 100,
+        check_status=404
+    )

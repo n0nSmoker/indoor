@@ -162,6 +162,8 @@ class CustomHTTPParser(FlaskParser):
 
         json_fields = {}
         spec_parameters = []
+        print('>>>>>>', type(argmap.__dict__.get('name')))
+        print('====>>', argmap.__dict__)
         for name, field in argmap.fields.items():
             if _location == 'json' and 'location' not in field.metadata:
                 json_fields[name] = field

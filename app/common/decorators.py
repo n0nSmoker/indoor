@@ -16,7 +16,7 @@ def check_auth(roles=None):
         @wraps(fn)
         def wrapped(*args, **kwargs):
             if not current_user or roles and current_user.role not in roles:
-                return fail(title='Доступ запрещен', status=403)
+                return fail('Доступ запрещен', status=403)
             return fn(*args, **kwargs)
         return wrapped
     return wrapper

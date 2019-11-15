@@ -1,9 +1,8 @@
 import pytest
-
 from lib.utils import get_random_str
 
 from app.users.models import User
-from app.users.constants import ROLE_MANAGER, ROLE_ADMIN
+from app.users.constants import ROLE_MANAGER, ROLE_ADMIN, ROLE_USER
 
 
 endpoint = 'users.update_user_view'
@@ -13,6 +12,7 @@ endpoint = 'users.update_user_view'
     (None, ROLE_MANAGER, f'{get_random_str()}@new.com',),
     (f'User-{get_random_str()}', None, f'{get_random_str()}@new.com',),
     (f'User-{get_random_str()}', ROLE_ADMIN, None,),
+    (f'User-{get_random_str()}', ROLE_USER, None,),
 ])
 def test_default(client, add_user, name, role, email):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
@@ -38,13 +38,39 @@ def test_default(client, add_user, name, role, email):
             assert getattr(user, var_name) == val
 
 
-def test_no_params_failure():
-    pass
+def test_no_params_failure(client, add_user):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
+
+    user = add_user()
+    _ = client.put(
+        endpoint=endpoint,
+        user_id=user.id,
+        check_status=400,
+        data=dict(
+            name=None,
+            role=None,
+            email=None,
+        )
+    )
 
 
-def test_malformed_params_failure():
-    pass
+@pytest.mark.parametrize("name,role,email", [
+    (None, 'WrongRole', f'{get_random_str()}@new.com',),
+    (123, None, f'{get_random_str()}@new.com',),
+    (f'User-{get_random_str()}', ROLE_ADMIN, 'Wrong_email',),
+    (f'User-{get_random_str()}', ROLE_USER, 'Wrong_.email@',),
+])
+def test_malformed_params_failure(client, add_user, name, role, email):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
-
-def test_not_all_params_passed_failure():
-    pass
+    user = add_user()
+    _ = client.put(
+        endpoint=endpoint,
+        user_id=user.id,
+        check_status=400,
+        data=dict(
+            name=name,
+            role=role,
+            email=email,
+        )
+    )

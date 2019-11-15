@@ -3,9 +3,6 @@ import subprocess
 from flask import url_for
 from IPython import embed
 from lib.factory import create_app, create_db, drop_db, init_app, is_db_exists
-
-
-from lib.swagger import init_docs
 from lib.utils import ApiException, find_models_and_tables
 from lib.auth import AuthManager
 
@@ -26,7 +23,7 @@ AuthManager(app, get_user_func=get_user_by_id)
 
 app.register_error_handler(ApiException, lambda err: err.to_result())
 
-init_docs(app=app, title='indoor API', version='0.0.1')
+# init_docs(app=app, title='indoor API', version='0.0.1')
 
 
 @app.cli.command()

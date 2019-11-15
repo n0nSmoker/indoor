@@ -38,7 +38,7 @@ user_by_id_view = dict(
         )
     }
 )
-
+    
 add_user_view = dict(
     summary='User create',
     tags=['USERS'],

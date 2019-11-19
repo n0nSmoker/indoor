@@ -1,17 +1,18 @@
 import logging
+import os
 import subprocess
-from flask import url_for
+
 from IPython import embed
 from lib.factory import create_app, create_db, drop_db, init_app, is_db_exists
+from lib.specs import register_specs
 from lib.utils import ApiException, find_models_and_tables
 from lib.auth import AuthManager
-
 
 from app.users.utils import get_user_by_id
 
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=os.environ.get('LOG_L EVEL', logging.WARNING),
     format='%(asctime)s | %(message)s',
     datefmt='%d.%m.%Y %H:%M:%S'
 )
@@ -21,9 +22,10 @@ app = create_app(name='indoor')
 init_app(app)
 AuthManager(app, get_user_func=get_user_by_id)
 
-app.register_error_handler(ApiException, lambda err: err.to_result())
+register_specs(app, title='Indoor API', version='0.1')
+# pprint(app.spec.to_dict())
 
-# init_docs(app=app, title='indoor API', version='0.0.1')
+app.register_error_handler(ApiException, lambda err: err.to_result())
 
 
 @app.cli.command()
@@ -62,25 +64,6 @@ def dbshell():
     connect_args = app.db.engine.url.translate_connect_args()
     connect_url = "postgresql://{username}:{password}@{host}:{port}/{database}".format(**connect_args)
     subprocess.call(['pgcli', connect_url])
-
-
-@app.cli.command()
-def routes():
-    """ List all avalable routes """
-    import urllib
-    output = []
-    for rule in app.url_map.iter_rules():
-        options = {}
-        for arg in rule.arguments:
-            options[arg] = "[{0}]".format(arg)
-
-        methods = ','.join(rule.methods)
-        url = url_for(rule.endpoint, **options)
-        line = urllib.parse.unquote("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
-        output.append(line)
-
-    for line in sorted(output):
-        print(line)
 
 
 if __name__ == '__main__':

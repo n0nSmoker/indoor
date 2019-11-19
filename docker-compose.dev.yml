@@ -1,4 +1,9 @@
 version: '3.4'
+x-environment: &environment
+  environment:
+    - FLASK_DEBUG=1
+    - LOG_LEVEL=ERROR
+
 services:
   indoor:
     ports:
@@ -9,3 +14,4 @@ services:
       - .:/var/www/app
     stdin_open: true
     tty: true
+    <<: *environment

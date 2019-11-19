@@ -99,8 +99,9 @@ def test_duplicate_email_failure(client, add_user):
         ),
         check_status=400
     )
-    assert 'title' in resp
-    assert resp['title'].lower().find('email') != -1
+    assert 'errors' in resp
+    assert len(resp['errors']) == 1
+    assert 'email' in resp['errors'][0].lower()
 
 
 @pytest.mark.parametrize("name,password,email", [
@@ -122,10 +123,8 @@ def test_no_required_params_failure(client, add_user, name, password, email):
     )
     assert 'errors' in resp
     assert len(resp['errors']) == 1
-    assert 'meta' in resp['errors'][0]
-    assert 'field' in resp['errors'][0]['meta']
-    info = resp['errors'][0]['meta']['field']
+    info = resp['errors'][0]
     for var_name in ('name', 'email', 'password'):
         val = locals()[var_name]
         if val is None:
-            assert info == var_name
+            assert var_name in info

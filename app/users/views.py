@@ -26,6 +26,8 @@ def list_view(page, limit, sort_by):
     get:
       tags:
         - Users
+      security:
+        - cookieAuth: []
       parameters:
       - in: query
         schema: FilterUsersSchema
@@ -59,6 +61,8 @@ def user_by_id_view(user_id):
     get:
       tags:
         - Users
+      security:
+        - cookieAuth: []
       responses:
         200:
           content:
@@ -82,6 +86,8 @@ def add_user_view(**kwargs):
     post:
       tags:
         - Users
+      security:
+        - cookieAuth: []
       content:
         schema: AddUserSchema
       responses:
@@ -113,6 +119,8 @@ def update_user_view(user_id, **kwargs):
     put:
       tags:
         - Users
+      security:
+        - cookieAuth: []
       content:
         schema: UpdateUserSchema
       responses:
@@ -150,6 +158,8 @@ def delete_user_view(user_id):
     delete:
       tags:
         - Users
+      security:
+        - cookieAuth: []
       responses:
         200:
           content:
@@ -163,7 +173,7 @@ def delete_user_view(user_id):
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
-    return success(user.to_dict())
+    return success(schemas.UserSchema().dump(user))
 
 
 @mod.route('/login', methods=['POST'])

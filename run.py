@@ -12,7 +12,7 @@ from app.users.utils import get_user_by_id
 
 
 logging.basicConfig(
-    level=os.environ.get('LOG_L EVEL', logging.WARNING),
+    level=os.environ.get('LOG_LEVEL', logging.WARNING),
     format='%(asctime)s | %(message)s',
     datefmt='%d.%m.%Y %H:%M:%S'
 )
@@ -23,6 +23,12 @@ init_app(app)
 AuthManager(app, get_user_func=get_user_by_id)
 
 register_specs(app, title='Indoor API', version='0.1')
+
+app.spec.components.security_scheme(
+    "cookieAuth",
+    {"type": "apiKey", "in": "cookie", "name": app.config['AUTH_COOKIE_NAME']}
+)
+# from pprint import pprint
 # pprint(app.spec.to_dict())
 
 app.register_error_handler(ApiException, lambda err: err.to_result())

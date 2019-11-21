@@ -173,7 +173,7 @@ def delete_user_view(user_id):
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
-    return success(schemas.UserSchema().dump(user))
+    return success(user.to_dict())
 
 
 @mod.route('/login', methods=['POST'])

@@ -1,14 +1,12 @@
 from datetime import datetime
-from sqlalchemy_serializer import SerializerMixin
 
 from lib.factory import db
 
 from .constants import STATUS_ACTIVE
 
 
-class User(db.Model, SerializerMixin):
+class User(db.Model):
     __tablename__ = 'users'
-    serialize_rules = ('-password',)
 
     id = db.Column(db.Integer, primary_key=True)
 

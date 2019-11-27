@@ -22,7 +22,7 @@ class UserSchema(ModelSchema):
 
 
 class UserListSchema(SuccessListSchema):
-    data = fields.List(fields.Nested(UserSchema()))
+    results = fields.List(fields.Nested(UserSchema()))
 
 
 class AddUserSchema(ma.Schema):

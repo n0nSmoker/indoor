@@ -16,6 +16,7 @@ def test_default(client, add_user):
     assert resp['total'] > 0
     assert 'results' in resp
     assert any([r['id'] == user.id for r in resp['results']])
+    assert 'password' not in resp['results'][0]
 
 
 def test_not_admin_failure(client, add_user):

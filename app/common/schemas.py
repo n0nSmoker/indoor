@@ -13,5 +13,5 @@ class FailSchema(ma.Schema):
 
 
 class SuccessListSchema(ma.Schema):
-    data = fields.List(fields.Raw())
+    results = fields.List(fields.Raw())
     total = fields.Number()

@@ -47,4 +47,3 @@ def login_user(email, password):
         token=sid
     )
     return user, sid
-

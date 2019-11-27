@@ -194,7 +194,7 @@ def delete_user_view(user_id):
 def login_user_view(email, password):
     """Update user.
     ---
-    put:
+    post:
       tags:
         - Users
       parameters:
@@ -205,6 +205,13 @@ def login_user_view(email, password):
           content:
             application/json:
               schema: UserSchema
+          headers:
+            Set-Cookie:
+              description:
+                Contains the session cookie named from env var `AUTH_COOKIE_NAME`.
+                Pass this cookie back in subsequent requests.
+              schema:
+                type: string
         400:
           content:
             application/json:

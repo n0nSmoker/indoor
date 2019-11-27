@@ -92,7 +92,8 @@ def add_user_view(**kwargs):
         - Users
       security:
         - cookieAuth: []
-      content:
+      parameters:
+      - in: form
         schema: AddUserSchema
       responses:
         200:
@@ -127,7 +128,8 @@ def update_user_view(user_id, **kwargs):
         - Users
       security:
         - cookieAuth: []
-      content:
+      parameters:
+      - in: form
         schema: UpdateUserSchema
       responses:
         200:
@@ -194,7 +196,8 @@ def login_user_view(email, password):
     put:
       tags:
         - Users
-      content:
+      parameters:
+      - in: form
         schema: LoginUserSchema
       responses:
         200:

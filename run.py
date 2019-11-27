@@ -4,7 +4,7 @@ import subprocess
 
 from IPython import embed
 from lib.factory import create_app, create_db, drop_db, init_app, is_db_exists
-from lib.specs import register_specs
+from lib.specs import register_swagger
 from lib.utils import ApiException, find_models_and_tables
 from lib.auth import AuthManager
 
@@ -22,14 +22,19 @@ app = create_app(name='indoor')
 init_app(app)
 AuthManager(app, get_user_func=get_user_by_id)
 
-register_specs(app, title='Indoor API', version='0.1')
-
-app.spec.components.security_scheme(
-    "cookieAuth",
-    {"type": "apiKey", "in": "cookie", "name": app.config['AUTH_COOKIE_NAME']}
+# Register specs and SwaggerUI
+register_swagger(
+    app=app,
+    title='Indoor API',
+    version='0.1',
+    security_schemes={
+        "cookieAuth": {
+            "type": "apiKey",
+            "in": "cookie",
+            "name": app.config['AUTH_COOKIE_NAME']
+        }
+    }
 )
-# from pprint import pprint
-# pprint(app.spec.to_dict())
 
 app.register_error_handler(ApiException, lambda err: err.to_result())
 

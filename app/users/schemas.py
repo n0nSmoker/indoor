@@ -45,4 +45,4 @@ class UpdateUserSchema(ma.Schema):
 
 class LoginUserSchema(ma.Schema):
     email = fields.Str(validate=validate.Email(), required=True)
-    password = fields.Str(validate=validate.Length(min=6, max=100), required=True)
+    password = fields.Str(validate=validate.Length(max=100), required=True)

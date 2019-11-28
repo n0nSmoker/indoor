@@ -1,4 +1,5 @@
 import logging
+import re
 
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -6,6 +7,8 @@ from apispec_webframeworks.flask import FlaskPlugin
 
 from flask import jsonify
 from flask_swagger_ui import get_swaggerui_blueprint
+
+from werkzeug.routing import FloatConverter, IntegerConverter
 
 
 logger = logging.getLogger('specs')
@@ -40,7 +43,10 @@ def register_swagger(app, title, version, openapi_version="3.0.2",
         logger.debug('Registering view functions in APISpec...')
         for key, view in app.view_functions.items():
             logger.debug('Register view:%s', key)
-            app.spec.path(view=view)
+            app.spec.path(
+                view=view,
+                parameters=get_inline_params(app, endpoint=key)
+            )
 
     # Add security schemes if needed
     if security_schemes:
@@ -51,8 +57,8 @@ def register_swagger(app, title, version, openapi_version="3.0.2",
     # Add Swagger UI
     api_path = '/swagger.json'
     blueprint = get_swaggerui_blueprint(
-        base_url = swagger_url,  # Swagger UI static files will be mapped to '{SWAGGER_URL}/dist/'
-        api_url = swagger_url + api_path,
+        base_url=swagger_url,  # Swagger UI static files will be mapped to '{SWAGGER_URL}/dist/'
+        api_url=swagger_url + api_path,
         config=None,  # Swagger UI config overrides
         # oauth_config={  # OAuth config. See https://github.com/swagger-api/swagger-ui#oauth2-configuration.
         #    'clientId': "your-client-id",
@@ -71,3 +77,26 @@ def register_swagger(app, title, version, openapi_version="3.0.2",
 
     # Register swaggerUI blueprint
     app.register_blueprint(blueprint, url_prefix=swagger_url)
+
+
+def get_inline_params(app, endpoint):
+    parameters = []
+    # Get url (APISpec works only with the first one)
+    url = app.url_map._rules_by_endpoint[endpoint][0]
+
+    # Check all inline params
+    for param, type_ in url._converters.items():
+        # Convert flask params type to swagger ones
+        type_ = {
+            IntegerConverter: 'integer',
+            FloatConverter: 'number',
+        }.get(type(type_), 'string')
+
+        # Add param
+        parameters.append({
+            'in': 'path',
+            'name': param,
+            'schema': {'type': type_}
+        })
+    return parameters
+

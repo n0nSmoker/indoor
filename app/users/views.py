@@ -93,9 +93,10 @@ def add_user_view(**kwargs):
         - Users
       security:
         - cookieAuth: []
-      parameters:
-      - in: form
-        schema: AddUserSchema
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema: AddUserSchema
       responses:
         200:
           content:
@@ -129,9 +130,10 @@ def update_user_view(user_id, **kwargs):
         - Users
       security:
         - cookieAuth: []
-      parameters:
-      - in: form
-        schema: UpdateUserSchema
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema: UpdateUserSchema
       responses:
         200:
           content:
@@ -197,9 +199,10 @@ def login_user_view(email, password):
     post:
       tags:
         - Users
-      parameters:
-      - in: form
-        schema: LoginUserSchema
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema: LoginUserSchema
       responses:
         200:
           content:

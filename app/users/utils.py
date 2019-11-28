@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from lib.factory import db
 from lib.utils import hash_password
 
+from .constants import ROLE_USER
 from .models import User, UserException
 
 
@@ -13,7 +14,7 @@ def get_user_by_id(user_id):
     return User.query.get(int(user_id))
 
 
-def create_user(email, password, name, **kwargs):
+def create_user(email, password, name, role=ROLE_USER, **kwargs):
     password = hash_password(
         salt=app.config['SECRET_KEY'],
         password=password
@@ -22,6 +23,7 @@ def create_user(email, password, name, **kwargs):
         email=email,
         password=password,
         name=name,
+        role=role,
         **kwargs
     )
     db.session.add(user)

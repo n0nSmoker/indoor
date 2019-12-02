@@ -25,3 +25,5 @@ REDIS_HOST = os.environ.get("REDIS_HOST", "indoor-redis")
 REDIS_PORT = os.environ.get("REDIS_PORT", 6379)
 
 AUTH_COOKIE_NAME = os.environ.get("AUTH_COOKIE_NAME", 'SID')
+SWAGGER_USERNAME = os.environ.get('SWAGGER_USERNAME')
+SWAGGER_PASSWORD = os.environ.get('SWAGGER_PASSWORD')

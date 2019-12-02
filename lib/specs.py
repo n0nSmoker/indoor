@@ -1,5 +1,4 @@
 import logging
-import re
 
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -10,6 +9,7 @@ from flask_swagger_ui import get_swaggerui_blueprint
 
 from werkzeug.routing import FloatConverter, IntegerConverter
 
+from lib.auth.decorators import basic_auth_decorator
 
 logger = logging.getLogger('specs')
 logger.setLevel(logging.DEBUG)
@@ -17,7 +17,9 @@ logger.setLevel(logging.DEBUG)
 
 def register_swagger(app, title, version, openapi_version="3.0.2",
                      swagger_url='/api/docs',
-                     security_schemes=None
+                     security_schemes=None,
+                     username=None,
+                     password=None
                      ):
     """
     Generates specs and registers SwaggerUI blueprint
@@ -30,6 +32,9 @@ def register_swagger(app, title, version, openapi_version="3.0.2",
         To get Examples see:
         https://apispec.readthedocs.io/en/latest/special_topics.html#documenting-security-schemes
         https://swagger.io/docs/specification/authentication/
+    :param str username: Username for basic auth.
+        No auth on swagger blueprint if None
+    :param str password: Password for basic auth
     :return:
     """
     # Generate specs
@@ -72,6 +77,10 @@ def register_swagger(app, title, version, openapi_version="3.0.2",
 
     # Add Swagger JSON route
     @blueprint.route(api_path)
+    @basic_auth_decorator(
+        username=username,
+        password=password,
+    )
     def swagger_json_view():
         return jsonify(app.spec.to_dict())
 
@@ -80,6 +89,13 @@ def register_swagger(app, title, version, openapi_version="3.0.2",
 
 
 def get_inline_params(app, endpoint):
+    """
+    Extracts inline params from endpoint and
+    returns respective params for spec
+    :param app:
+    :param endpoint:
+    :return:
+    """
     parameters = []
     # Get url (APISpec works only with the first one)
     url = app.url_map._rules_by_endpoint[endpoint][0]

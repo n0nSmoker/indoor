@@ -17,7 +17,7 @@ class AuthManager:
         app.auth_manager = self
         self.get_user_func = get_user_func
         self.cache = app.cache
-        self.cookie_name = app.config.get('AUTH_COOKIE_NAME')
+        self.cookie_name = app.config['AUTH_COOKIE_NAME']
 
     def get_user(self):
         if not hasattr(_request_ctx_stack.top, 'user'):
@@ -28,7 +28,8 @@ class AuthManager:
 
             if token:
                 user_id = self.cache.get_user_id(token)
-                user = self.get_user_func(user_id)
+                if user_id:
+                    user = self.get_user_func(user_id)
 
             _request_ctx_stack.top.user = user
 

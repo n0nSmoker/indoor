@@ -3,7 +3,7 @@ import pytest
 from app.users.utils import get_user_by_id, create_user
 from app.users.constants import ROLE_USER
 
-from lib.auth import AuthManager
+from lib.auth.manager import AuthManager
 from lib.factory import create_app, create_db, create_tables, drop_db, init_app
 from lib.utils import get_random_str
 

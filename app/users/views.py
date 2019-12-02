@@ -1,16 +1,16 @@
 from datetime import datetime
 
-from flask import Blueprint, current_app as app
+from flask import Blueprint, current_app as app, request
 from sqlalchemy.exc import IntegrityError
 
 from lib.factory import db
 from lib.utils import setattrs, success, fail
 from lib.webargs import parser
 
-from app.common.decorators import admin_required
+from app.common.decorators import admin_required, auth_required
 
 from .models import User, UserException
-from .utils import create_user, login_user
+from .utils import create_user, login_user, logout_user
 from .schemas import (FilterUsersSchema, UpdateUserSchema, UserListSchema,
                       UserSchema, AddUserSchema, LoginUserSchema)
 
@@ -194,11 +194,11 @@ def delete_user_view(user_id):
 @mod.route('/login', methods=['POST'])
 @parser.use_kwargs(LoginUserSchema())
 def login_user_view(email, password):
-    """Update user.
+    """Login user.
     ---
     post:
       tags:
-        - Users
+        - Auth
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -230,3 +230,35 @@ def login_user_view(email, password):
         data=UserSchema().dump(user),
         cookies={app.config.get('AUTH_COOKIE_NAME'): sid}
     )
+
+
+@mod.route('/logout', methods=['POST'])
+@auth_required
+def logout_user_view():
+    """Logout user.
+    ---
+    post:
+      tags:
+        - Auth
+      responses:
+        200:
+          content:
+            text/plain:
+                schema:
+                    type: string
+                    example: ok
+          headers:
+            Set-Cookie:
+              description:
+                Contains the session cookie named from env var `AUTH_COOKIE_NAME`
+                with empty value
+              schema:
+                type: string
+        401:
+          description: Not authorised
+        5XX:
+          description: Unexpected error
+    """
+    sid = request.cookies.get(app.config['AUTH_COOKIE_NAME'])
+    logout_user(sid)
+    return success('ok')

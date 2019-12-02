@@ -29,6 +29,14 @@ class Cache:
         """
         raise NotImplementedError('Depends on storage type')
 
+    def _del(self, *keys):
+        """
+        Deletes value
+        :param keys: list of strings
+        :return:
+        """
+        raise NotImplementedError('Depends on storage type')
+
     def _get_auth_key(self, token):
         """
         Generates cache-key for auth data
@@ -60,6 +68,14 @@ class Cache:
             ttl=3600
         )
 
+    def invalidate_auth_token(self, token):
+        """
+        Removes token and user data from the storage
+        :param token:
+        :return:
+        """
+        self._del(self._get_auth_key(token))
+
 
 class RedisCache(Cache):
     def _get(self, key):
@@ -67,3 +83,6 @@ class RedisCache(Cache):
 
     def _set(self, key, value, ttl=None):
         self.storage.set(name=key, value=value, ex=ttl)
+
+    def _del(self, *keys):
+        self.storage.delete(*keys)

@@ -49,3 +49,7 @@ def login_user(email, password):
         token=sid
     )
     return user, sid
+
+
+def logout_user(sid):
+    app.cache.invalidate_auth_token(token=sid)

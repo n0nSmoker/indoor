@@ -37,8 +37,8 @@ def list_view(page, limit, sort_by):
           content:
             application/json:
               schema: UserListSchema
-        401:
-          description: Not authorised
+        403:
+          description: Forbidden
         400:
           content:
             application/json:
@@ -71,8 +71,8 @@ def user_by_id_view(user_id):
           content:
             application/json:
               schema: UserSchema
-        401:
-          description: Not authorised
+        403:
+          description: Forbidden
         404:
           description: No such item
         5XX:
@@ -102,12 +102,12 @@ def add_user_view(**kwargs):
           content:
             application/json:
               schema: UserSchema
-        401:
-          description: Not authorised
         400:
           content:
             application/json:
               schema: FailSchema
+        403:
+          description: Forbidden
         5XX:
           description: Unexpected error
     """
@@ -139,12 +139,12 @@ def update_user_view(user_id, **kwargs):
           content:
             application/json:
               schema: UserSchema
-        401:
-          description: Not authorised
         400:
           content:
             application/json:
               schema: FailSchema
+        403:
+          description: Forbidden
         404:
           description: No such item
         5XX:
@@ -178,8 +178,8 @@ def delete_user_view(user_id):
           content:
             application/json:
               schema: UserSchema
-        401:
-          description: Not authorised
+        403:
+          description: Forbidden
         404:
           description: No such item
         5XX:
@@ -254,8 +254,8 @@ def logout_user_view():
                 with empty value
               schema:
                 type: string
-        401:
-          description: Not authorised
+        403:
+          description: Forbidden
         5XX:
           description: Unexpected error
     """

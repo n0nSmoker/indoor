@@ -82,13 +82,13 @@ def dbshell():
 @app.cli.command()
 def addadmin():
     """ Create admin user """
-    from app.users.utils import create_user
+    from app.users.utils import save_user
     from app.users.constants import ROLE_ADMIN
 
     email = input('Email: ')
     password = input('Password: ')
 
-    create_user(
+    save_user(
         email=email,
         password=password,
         role=ROLE_ADMIN,

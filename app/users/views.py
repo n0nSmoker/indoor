@@ -1,16 +1,13 @@
-from datetime import datetime
-
 from flask import Blueprint, current_app as app, request
-from sqlalchemy.exc import IntegrityError
 
 from lib.factory import db
-from lib.utils import setattrs, success, fail
+from lib.utils import success, fail
 from lib.webargs import parser
 
 from app.common.decorators import admin_required, auth_required
 
 from .models import User, UserException
-from .utils import create_user, login_user, logout_user
+from .utils import save_user, login_user, logout_user
 from .schemas import (FilterUsersSchema, UpdateUserSchema, UserListSchema,
                       UserSchema, AddUserSchema, LoginUserSchema)
 
@@ -112,7 +109,7 @@ def add_user_view(**kwargs):
           description: Unexpected error
     """
     try:
-        user = create_user(**kwargs)
+        user = save_user(**kwargs)
     except UserException as e:
         return fail(str(e))
 
@@ -151,14 +148,10 @@ def update_user_view(user_id, **kwargs):
           description: Unexpected error
     """
     user = User.query.get_or_404(user_id)
-    setattrs(user, **kwargs, updated_at=datetime.utcnow(), ignore_nulls=True)
-
-    db.session.add(user)
     try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        return fail('Email is already in use')
+        user = save_user(instance=user, **kwargs)
+    except UserException as e:
+        return fail(str(e))
 
     return success(UserSchema().dump(user))
 

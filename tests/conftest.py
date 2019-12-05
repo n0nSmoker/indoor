@@ -1,6 +1,6 @@
 import pytest
 
-from app.users.utils import get_user_by_id, create_user
+from app.users.utils import get_user_by_id, save_user
 from app.users.constants import ROLE_USER
 
 from app.publishers.utils import save_publisher
@@ -86,7 +86,7 @@ def add_user(client):
         email = email or f'{get_random_str()}@email.com'
         password = password or get_random_str()
 
-        user = create_user(
+        user = save_user(
             name=name,
             email=email,
             password=password,

@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-import json
+import simplejson as json
 import functools
 import logging
 
@@ -180,10 +180,8 @@ def db_func_fixture(**kwargs):
 
             yield func_decorator(func(*a, **kw))
 
-            types = set()
             for i in instances:
                 db.session.delete(i)
-                types.add(i.__class__)
                 logger.info('Deleted instance id:%s type:%s', i.id, i.__class__)
             db.session.commit()
 

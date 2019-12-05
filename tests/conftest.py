@@ -3,6 +3,8 @@ import pytest
 from app.users.utils import get_user_by_id, create_user
 from app.users.constants import ROLE_USER
 
+from app.publishers.utils import save_publisher
+
 from lib.auth.manager import AuthManager
 from lib.factory import create_app, create_db, create_tables, drop_db, init_app
 from lib.utils import get_random_str
@@ -65,9 +67,16 @@ def client(app):  #noqa
     return Client(app=app)
 
 
-@pytest.fixture(scope='session')
-def empty_list_resp():
-    return dict(results=[], total=0)
+@db_func_fixture(scope='module')
+def add_publisher():
+    def func(name=None, comment=None, airtime=None, created_by=None):
+        return save_publisher(
+            name=name or get_random_str(),
+            comment=comment,
+            airtime=airtime,
+            created_by=created_by
+        )
+    return func
 
 
 @db_func_fixture(scope='module')

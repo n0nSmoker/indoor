@@ -21,7 +21,7 @@ mod = Blueprint('users', __name__, url_prefix='/users')
 @mod.route('/')
 @admin_required
 @parser.use_kwargs(FilterUsersSchema())
-def list_view(page, limit, sort_by):
+def users_list_view(page, limit, sort_by):
     """Get list of users.
     ---
     get:

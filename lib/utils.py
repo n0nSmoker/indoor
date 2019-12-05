@@ -4,7 +4,9 @@ import random
 import re
 import string
 
-from flask import jsonify, make_response
+import simplejson as json
+
+from flask import make_response, current_app
 from flask_sqlalchemy import Model
 from sqlalchemy.sql.schema import Table
 from werkzeug.utils import find_modules, import_string
@@ -60,7 +62,27 @@ def setattrs(obj, ignore_nulls=False, **kwargs):
             setattr(obj, attr, kwargs[attr])
 
 
+def jsonify(data):
+    """
+    Returns data wrapped in response class
+    with corresponding mimetype (Uses default JSONIFY_MIMETYPE)
+    :param any data:
+    :return:
+    """
+    return current_app.response_class(
+        json.dumps(data),
+        mimetype=current_app.config["JSONIFY_MIMETYPE"],
+    )
+
+
 def success(data, headers=None, cookies=None):
+    """
+    Generates successful response
+    :param data:
+    :param headers:
+    :param cookies:
+    :return:
+    """
     status = 200
     resp = make_response(jsonify(data), status)
     if cookies:
@@ -85,7 +107,7 @@ def fail(msg, status=400):
     """
     if not isinstance(msg, list):
         msg = [msg]
-    return make_response(jsonify(dict(errors=msg)), status)
+    return make_response(jsonify({'errors': msg}), status)
 
 
 def add_or_update_attr(func, param, value):
@@ -98,6 +120,11 @@ def add_or_update_attr(func, param, value):
 
 
 def get_random_str(length=10):
+    """
+    Generates random string of given length
+    :param length:
+    :return:
+    """
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
 

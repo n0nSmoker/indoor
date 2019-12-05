@@ -3,7 +3,7 @@ import pytest
 from app.users.constants import ROLE_ADMIN, ROLE_USER
 
 
-endpoint = 'users.list_view'
+endpoint = 'users.users_list_view'
 
 
 def test_default(client, add_user):

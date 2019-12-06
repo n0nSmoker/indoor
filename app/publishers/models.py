@@ -9,7 +9,7 @@ class Publisher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(255), unique=True, index=True, nullable=False)
-    comment = db.Column(db.String(1024), nullable=True)
+    comment = db.Column(db.String(1024), index=True, nullable=True)
     airtime = db.Column(db.DECIMAL(precision=4, scale=1), index=True, nullable=True)
 
     created_by = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))

@@ -19,7 +19,7 @@ mod = Blueprint('publishers', __name__, url_prefix='/publishers')
 @mod.route('/')
 @admin_required
 @parser.use_kwargs(FilterPublishersSchema())
-def publishers_list_view(page, limit, sort_by):
+def publishers_list_view(page, limit, sort_by, name, comment):
     """Get list of publishers.
     ---
     get:
@@ -45,8 +45,14 @@ def publishers_list_view(page, limit, sort_by):
           description: Unexpected error
     """
     q = Publisher.query
-    total = q.count()
 
+    if name:
+        q = q.filter(Publisher.name.ilike(f'%{name}%'))
+
+    if comment:
+        q = q.filter(Publisher.comment.ilike(f'%{comment}%'))
+
+    total = q.count()
     q = q.order_by(sort_by).offset((page - 1) * limit).limit(limit)
     return success(PublisherListSchema().dump(dict(
         results=q,

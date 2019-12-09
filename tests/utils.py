@@ -113,9 +113,10 @@ class Client:
         if headers:
             kwargs['headers'] = headers
 
+        logger.debug('Request %s %s kwargs:%s', method, url, kwargs)
         resp = func(url, **kwargs)
 
-        if check_status:
+        if check_status:    
             assert resp.status_code == check_status, resp.data.decode('utf-8')
 
         if check_cookies:
@@ -182,7 +183,7 @@ def db_func_fixture(**kwargs):
 
             for i in instances:
                 db.session.delete(i)
-                logger.info('Deleted instance id:%s type:%s', i.id, i.__class__)
+                logger.debug('Deleted instance id:%s type:%s', i.id, i.__class__)
             db.session.commit()
 
         return wrapped_fixture

@@ -7,6 +7,8 @@ from app.users.constants import ROLE_ADMIN, ROLE_USER
 
 endpoint = 'publishers.publishers_list_view'
 
+search_fields = ['name', 'comment']
+
 
 def test_default(client, add_user, add_publisher):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
@@ -22,38 +24,62 @@ def test_default(client, add_user, add_publisher):
     assert 'created_by' not in resp['results'][0]
 
 
-@pytest.mark.parametrize('param', ['comment', 'name'])
-def test_search_mode(client, add_user, add_publisher, param):
+def test_search_mode(client, add_user, add_publisher):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     # Create publishers
+    test_cases = []
+    all_ids = set()
     common_string = get_random_str(15)
-    params = [
-        {param: common_string + get_random_str()},
-        {param: common_string + get_random_str()},
-        {param: get_random_str() + common_string},
-        {param: get_random_str() + common_string + get_random_str()},
-    ]
-    publishers = [add_publisher(**p) for p in params]
-    # Add trash publishers to make some noise
-    [add_publisher(**{param: get_random_str()}) for _ in range(10)]
+    for params in [[f] for f in search_fields] + [search_fields]:
+        # Add trash publishers to make some noise
+        add_publisher(**{p: get_random_str() for p in params})
+        
+        # Add publishers with common string in params
+        prefixed = common_string + get_random_str()
+        postfixed = get_random_str() + common_string
+        middle = get_random_str() + common_string + get_random_str()
 
-    # Prepare test cases
-    param2publisher_ids = [
-        (getattr(publishers[0], param)[:-1], {publishers[0].id}),
-        (common_string, {p.id for p in publishers})
-    ]
+        prefixed_id = add_publisher(**{p: prefixed for p in params}).id
+        all_ids.update({
+            prefixed_id,
+            add_publisher(**{p: postfixed for p in params}).id,
+            add_publisher(**{p: middle for p in params}).id,
+        })
+        test_cases.append((prefixed[:-1], {prefixed_id}))
+    # Add common test case
+    test_cases.append((common_string, all_ids))
+    
     # Run test cases
-    for search, publisher_ids in param2publisher_ids:
+    for query, publisher_ids in test_cases:
         resp = client.get(
             endpoint=endpoint,
-            **{param: search}
+            query=query,
+            query_fields=[f for f in search_fields]
         )
         assert 'total' in resp
         assert resp['total'] == len(publisher_ids)
 
         assert 'results' in resp
         assert {r['id'] for r in resp['results']} == publisher_ids
+
+
+def test_search_mode_failure(client, add_user, add_publisher):
+    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
+
+    common_string = get_random_str(15)
+    test_cases = [
+        (add_publisher(**{p: get_random_str() + common_string}), p)
+        for p in search_fields
+    ]
+    for publisher, param in test_cases:
+        resp = client.get(
+            endpoint=endpoint,
+            query=common_string,
+            query_fields=list(set(search_fields) - {param})
+        )
+        assert 'results' in resp
+        assert publisher.id not in {r['id'] for r in resp['results']}
 
 
 def test_not_admin_failure(client, add_user):
@@ -81,13 +107,13 @@ def test_not_admin_failure(client, add_user):
     ('sort_by', '-created_by'),
     ('sort_by', '--name'),
 
-    ('name', get_random_str(1)),
-    ('name', get_random_str(2)),
-    ('name', get_random_str(101)),
+    ('query', get_random_str(1)),
+    ('query', get_random_str(2)),
+    ('query', get_random_str(101)),
 
-    ('comment', get_random_str(1)),
-    ('comment', get_random_str(2)),
-    ('comment', get_random_str(101)),
+    ('query_fields', search_fields + ['some_wrong_value']),
+    ('query_fields', ['some_wrong_value']),
+    ('query_fields', 'not_even_a_list'),
 ])
 def test_wrong_params_failure(client, add_user, param, value):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)

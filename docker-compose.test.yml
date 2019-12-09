@@ -5,6 +5,7 @@ x-environment: &environment
     - TESTING=1
     - SERVER_NAME=127.0.0.1:5000
     - TEST_FILE=${TEST_FILE}
+    - LOG_LEVEL=DEBUG
 
 services:
   indoor:

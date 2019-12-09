@@ -12,8 +12,13 @@ class FilterPublishersSchema(FilterSchema):
             ['id', 'name', 'created_at', 'updated_at']),
         missing='created_at'
     )
-    name = fields.Str(validate=validate.Length(min=3, max=100), missing=None)
-    comment = fields.Str(validate=validate.Length(min=3, max=100), missing=None)
+    query = fields.Str(validate=validate.Length(min=3, max=100), missing=None)
+    query_fields = fields.List(
+        fields.Str(),
+        validate=validate.ContainsOnly(
+            ['name', 'comment']),
+        missing=['name', 'comment']
+    )
 
 
 class PublisherSchema(ModelSchema):

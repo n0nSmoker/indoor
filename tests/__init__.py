@@ -1,4 +1,5 @@
 import logging
+import os
 
 logging.basicConfig(
     level=logging.WARN,
@@ -8,4 +9,4 @@ logging.basicConfig(
 
 
 logger = logging.getLogger('indoor')
-logger.setLevel(logging.INFO)
+logger.setLevel(os.environ.get('LOG_LEVEL', logging.DEBUG))

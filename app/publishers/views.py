@@ -1,4 +1,5 @@
 from flask import Blueprint
+from sqlalchemy import or_
 
 from lib.auth.manager import current_user
 from lib.factory import db
@@ -19,7 +20,7 @@ mod = Blueprint('publishers', __name__, url_prefix='/publishers')
 @mod.route('/')
 @admin_required
 @parser.use_kwargs(FilterPublishersSchema())
-def publishers_list_view(page, limit, sort_by, name, comment):
+def publishers_list_view(page, limit, sort_by, query, query_fields):
     """Get list of publishers.
     ---
     get:
@@ -46,11 +47,13 @@ def publishers_list_view(page, limit, sort_by, name, comment):
     """
     q = Publisher.query
 
-    if name:
-        q = q.filter(Publisher.name.ilike(f'%{name}%'))
-
-    if comment:
-        q = q.filter(Publisher.comment.ilike(f'%{comment}%'))
+    if query:
+        q = q.filter(
+            or_(*[
+                getattr(Publisher, f).ilike(f'%{query}%')
+                for f in query_fields
+            ])
+        )
 
     total = q.count()
     q = q.order_by(sort_by).offset((page - 1) * limit).limit(limit)

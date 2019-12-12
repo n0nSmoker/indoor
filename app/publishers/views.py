@@ -85,8 +85,8 @@ def publisher_by_id_view(publisher_id):
         5XX:
           description: Unexpected error
     """
-    user = Publisher.query.get_or_404(publisher_id)
-    return success(PublisherSchema().dump(user))
+    publisher = Publisher.query.get_or_404(publisher_id)
+    return success(PublisherSchema().dump(publisher))
 
 
 @mod.route('/', methods=['POST'])

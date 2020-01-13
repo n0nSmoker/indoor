@@ -119,13 +119,14 @@ def add_or_update_attr(func, param, value):
         setattr(func, param, value)
 
 
-def get_random_str(length=10):
+def get_random_str(length=10, punctuation=False):
     """
     Generates random string of given length
     :param length:
+    :param punctuation:
     :return:
     """
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+    return ''.join(random.choices(string.ascii_uppercase + string.digits + (string.punctuation if punctuation else ''), k=length))
 
 
 def hash_password(salt, password):

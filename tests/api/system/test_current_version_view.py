@@ -5,10 +5,14 @@ from lib.utils import get_random_str
 endpoint = 'system.current_version_view'
 
 
-def test_default(client):
+@pytest.mark.parametrize("os_version", [
+    (get_random_str(1024, punctuation=True)),
+    (get_random_str(1, punctuation=True)),
+])
+def test_default(client, os_version):
     resp = client.get(
         endpoint=endpoint,
-        os_version=get_random_str(150)
+        os_version=os_version
     )
     assert 'version' in resp
     assert 'download_url' in resp
@@ -17,7 +21,7 @@ def test_default(client):
 @pytest.mark.parametrize("os_version, param_name", [
     # Malformed os_version
     (None, 'os_version'),
-    (get_random_str(1025), 'os_version'),
+    (get_random_str(1025, punctuation=True), 'os_version'),
 ])
 def test_malformed_params_failure(client, os_version, param_name):
     resp = client.get(

@@ -4,6 +4,10 @@ from app.devices.utils import get_device_by_token
 from app.users.utils import get_user_by_id, save_user
 from app.users.constants import ROLE_USER
 
+from app.publishers.utils import save_publisher
+
+from app.system.utils import save_device_health
+
 from lib.auth.manager import AuthManager
 from lib.factory import create_app, create_db, create_tables, drop_db, init_app
 from lib.utils import get_random_str
@@ -67,6 +71,29 @@ def session(app, request):  #noqa
 def client(app):  #noqa
     yield Client(app=app)
     truncate_all_tables()
+
+
+@db_func_fixture(scope='module')
+def add_device_health():
+    def func(device_id=None, software_version=None, created_at=None):
+        return save_device_health(
+            device_id=device_id or get_random_str(punctuation=True),
+            software_version=software_version,
+            created_at=created_at
+        )
+    return func
+
+
+@db_func_fixture(scope='module')
+def add_publisher():
+    def func(name=None, comment=None, airtime=None, created_by=None):
+        return save_publisher(
+            name=name or get_random_str(),
+            comment=comment,
+            airtime=airtime,
+            created_by=created_by
+        )
+    return func
 
 
 @pytest.fixture(scope='function')

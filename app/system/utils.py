@@ -13,5 +13,5 @@ def save_device_health(**kwargs):
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        raise DeviceHealthException()
+        raise DeviceHealthException('IntegrityError')
     return instance

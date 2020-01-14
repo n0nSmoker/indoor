@@ -81,8 +81,11 @@ def test_filter_by_date_range(client, add_device_health):
     ('end_date_time', get_random_str()),
 ])
 def test_malformed_params_failure(client, param, value):
-    _ = client.get(
+    resp = client.get(
         endpoint=endpoint,
         check_status=400,
         **{param: value}
     )
+    assert 'errors' in resp
+    assert len(resp['errors']) == 1
+    assert param in resp['errors'][0].lower()

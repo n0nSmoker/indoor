@@ -21,8 +21,6 @@ def current_version_view(os_version):
     get:
         tags:
           - System
-        security:
-        - cookieAuth: []
         parameters:
         - in: query
           schema: OSVersionSchema
@@ -31,8 +29,6 @@ def current_version_view(os_version):
             content:
               application/json:
                 schema: SoftwareVersionSchema
-          403:
-            description: Forbidden
           400:
             content:
               application/json:
@@ -55,8 +51,6 @@ def devices_health_list_view(page, limit, sort_by, device_id, start_date_time, e
     get:
       tags:
         - System
-      security:
-        - cookieAuth: []
       parameters:
       - in: query
         schema: FilterDeviceHealthSchema
@@ -65,8 +59,6 @@ def devices_health_list_view(page, limit, sort_by, device_id, start_date_time, e
           content:
             application/json:
               schema: DeviceHealthListSchema
-        403:
-          description: Forbidden
         400:
           content:
             application/json:
@@ -99,8 +91,6 @@ def add_device_health_view(**kwargs):
     post:
       tags:
         - System
-      security:
-        - cookieAuth: []
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -114,8 +104,6 @@ def add_device_health_view(**kwargs):
           content:
             application/json:
               schema: FailSchema
-        403:
-          description: Forbidden
         5XX:
           description: Unexpected error
     """

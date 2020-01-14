@@ -4,8 +4,6 @@ from lib.utils import get_random_str
 
 from app.system.models import DeviceHealth
 
-from app.users.constants import ROLE_USER
-
 
 endpoint = 'system.add_device_health_view'
 

@@ -41,8 +41,9 @@ def current_version_view(os_version):
             description: Unexpected error
     """
     return success({
-        'version': f'1.13.64 for {os_version}',
-        'download_url': f'https://download.software/1.13.64.{os_version}.file',
+        'version': f'1.13.64',
+        'os_version': os_version,
+        'download_url': f'https://download.software/1.13.64_{os_version.replace(" ", "_")}.file',
     })
 
 

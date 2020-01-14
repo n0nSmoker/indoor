@@ -4,15 +4,17 @@ from marshmallow_sqlalchemy import ModelSchema
 
 from app.common.schemas import FilterSchema, SuccessListSchema
 from app.system.models import DeviceHealth
+from app.system.constants import OS
 
 
 class OSVersionSchema(ma.Schema):
-    os_version = fields.Str(validate=validate.Length(min=1, max=1024), required=True)
+    os_version = fields.Str(validate=validate.OneOf([os for os in OS]), required=True)
 
 
 class SoftwareVersionSchema(ma.Schema):
-    software_version = fields.Str(validate=validate.Length(min=1, max=255), missing=None)
-    download_url = fields.Str(validate=validate.Length(min=1, max=1024), missing=None)
+    software_version = fields.Str(validate=validate.Length(min=1, max=255), required=True)
+    os_version = fields.Str(validate=validate.Length(min=1, max=255), required=True)
+    download_url = fields.Str(validate=validate.Length(min=1, max=1024), required=True)
 
 
 class FilterDeviceHealthSchema(FilterSchema):

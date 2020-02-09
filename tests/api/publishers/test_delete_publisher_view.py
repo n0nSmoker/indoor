@@ -1,11 +1,11 @@
 from app.publishers.models import Publisher
 from app.users.constants import ROLE_USER, ROLE_ADMIN
-
+from tests.helpers import add_publisher
 
 endpoint = 'publishers.delete_publisher_view'
 
 
-def test_default(client, add_user, add_publisher):
+def test_default(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     publisher = add_publisher()
@@ -15,10 +15,10 @@ def test_default(client, add_user, add_publisher):
     )
     assert 'id' in resp
     assert resp['id'] == publisher.id
-    assert not Publisher.query.filter_by(id=resp['id']).one_or_none()
+    assert not Publisher.query.get(resp['id'])
 
 
-def test_not_admin_failure(client, add_user, add_publisher):
+def test_not_admin_failure(client, add_user):
     _ = add_user(role=ROLE_USER, log_him_in=True)
 
     publisher = add_publisher()
@@ -29,7 +29,7 @@ def test_not_admin_failure(client, add_user, add_publisher):
     )
 
 
-def test_wrong_id_failure(client, add_user, add_publisher):
+def test_wrong_id_failure(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     publisher = add_publisher()
@@ -38,4 +38,4 @@ def test_wrong_id_failure(client, add_user, add_publisher):
         publisher_id=129129129129192,
         check_status=404
     )
-    assert Publisher.query.filter_by(id=publisher.id).one_or_none()
+    assert Publisher.query.get(publisher.id)

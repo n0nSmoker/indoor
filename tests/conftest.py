@@ -1,16 +1,14 @@
 import pytest
 
+from app.devices.utils import get_device_by_token
 from app.users.utils import get_user_by_id, save_user
 from app.users.constants import ROLE_USER
-
-from app.publishers.utils import save_publisher
 
 from lib.auth.manager import AuthManager
 from lib.factory import create_app, create_db, create_tables, drop_db, init_app
 from lib.utils import get_random_str
 
-from .utils import Client, db_func_fixture
-
+from .utils import Client, truncate_all_tables
 
 APP_NAME = 'indoor'
 
@@ -20,7 +18,10 @@ def app(request):
     """Session-wide test `Flask` application."""
     test_app = create_app(name=APP_NAME)
     init_app(test_app)
-    AuthManager(test_app, get_user_func=get_user_by_id)
+    AuthManager(
+        test_app,
+        get_user_func=get_user_by_id,
+        get_device_func=get_device_by_token)
 
     dsn = test_app.config['SQLALCHEMY_DATABASE_URI']
     drop_db(dsn)
@@ -62,24 +63,13 @@ def session(app, request):  #noqa
     return test_session
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def client(app):  #noqa
-    return Client(app=app)
+    yield Client(app=app)
+    truncate_all_tables()
 
 
-@db_func_fixture(scope='module')
-def add_publisher():
-    def func(name=None, comment=None, airtime=None, created_by=None):
-        return save_publisher(
-            name=name or get_random_str(),
-            comment=comment,
-            airtime=airtime,
-            created_by=created_by
-        )
-    return func
-
-
-@db_func_fixture(scope='module')
+@pytest.fixture(scope='function')
 def add_user(client):
     def func(name=None, email=None, password=None, role=ROLE_USER, log_him_in=False, **kwargs):
         name = name or f'User_{get_random_str()}'
@@ -107,7 +97,7 @@ def add_user(client):
     return func
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def login(app, client):
     def func(email, password):
         _ = client.post(

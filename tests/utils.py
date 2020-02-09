@@ -152,40 +152,18 @@ class ClientException(Exception):
     pass
 
 
-def db_func_fixture(**kwargs):
-    """
-    Decorates fixture function which should return a function
-    which in turn should create and return single or a list of
-    db.Model instances
-    :param kwargs: any params for pytest.fixture function
-    :return:
-    """
-    def fixture_decorator(func):
-        func = pytest.fixture(**kwargs)(func)
+def truncate_all_tables():
+    meta = db.metadata
+    for table in reversed(meta.sorted_tables):
+        logger.info('Clear table %s' % table)
+        db.session.execute(table.delete())  # Truncates table
+    db.session.commit()
 
-        @functools.wraps(func)
-        def wrapped_fixture(*a, **kw):
-            instances = []
 
-            def func_decorator(f):
-                @functools.wraps(f)
-                def decorated_func(*a, **kw):
-                    resp = f(*a, **kw)
-                    err_msg = f'Function {func.__name__}->{f.__name__} should return db.Model instance(s)'
-                    for instance in [resp] if not isinstance(resp, list) else resp:
-                        assert issubclass(instance.__class__, Model), err_msg
-                        instances.append(instance)
-                    return resp
-
-                return decorated_func
-
-            yield func_decorator(func(*a, **kw))
-
-            for i in instances:
-                db.session.delete(i)
-                logger.debug('Deleted instance id:%s type:%s', i.id, i.__class__)
-            db.session.commit()
-
-        return wrapped_fixture
-    return fixture_decorator
-
+def clear_data(fn):
+    @functools.wraps(fn)
+    def decorated(*args, **kwargs):
+        result = fn(*args, **kwargs)
+        truncate_all_tables()
+        return result
+    return decorated

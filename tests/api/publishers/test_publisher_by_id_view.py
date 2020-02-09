@@ -1,9 +1,10 @@
 from app.users.constants import ROLE_ADMIN, ROLE_USER
+from tests.helpers import add_publisher
 
 endpoint = 'publishers.publisher_by_id_view'
 
 
-def test_defaut(client, add_user, add_publisher):
+def test_defaut(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     publisher = add_publisher()
@@ -20,7 +21,7 @@ def test_defaut(client, add_user, add_publisher):
     assert 'created_by' not in resp
 
 
-def test_not_admin_failure(client, add_user, add_publisher):
+def test_not_admin_failure(client, add_user):
     _ = add_user(role=ROLE_USER, log_him_in=True)
 
     publisher = add_publisher()
@@ -31,7 +32,7 @@ def test_not_admin_failure(client, add_user, add_publisher):
     )
 
 
-def test_wrong_id_failure(client, add_user, add_publisher):
+def test_wrong_id_failure(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     publisher = add_publisher()

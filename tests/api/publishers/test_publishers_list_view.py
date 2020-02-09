@@ -3,14 +3,14 @@ import pytest
 from lib.utils import get_random_str
 
 from app.users.constants import ROLE_ADMIN, ROLE_USER
-
+from tests.helpers import add_publisher
 
 endpoint = 'publishers.publishers_list_view'
 
 search_fields = ['name', 'comment']
 
 
-def test_default(client, add_user, add_publisher):
+def test_default(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     publisher = add_publisher()
@@ -18,13 +18,14 @@ def test_default(client, add_user, add_publisher):
         endpoint=endpoint
     )
     assert 'total' in resp
-    assert resp['total'] > 0
+    assert resp['total'] == 1
     assert 'results' in resp
-    assert any([r['id'] == publisher.id for r in resp['results']])
+    assert len(resp['results']) == 1
+    assert publisher.id == resp['results'][0]['id']
     assert 'created_by' not in resp['results'][0]
 
 
-def test_search_mode(client, add_user, add_publisher):
+def test_search_mode(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     # Create publishers
@@ -64,7 +65,7 @@ def test_search_mode(client, add_user, add_publisher):
         assert {r['id'] for r in resp['results']} == publisher_ids
 
 
-def test_search_mode_failure(client, add_user, add_publisher):
+def test_search_mode_failure(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     common_string = get_random_str(15)

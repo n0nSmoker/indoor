@@ -9,6 +9,12 @@ from .models import Publisher, PublisherException
 
 
 def save_publisher(instance=None, **kwargs):
+    """
+    Creates new or updates existing publisher
+    :param instance: Instance of publisher to update
+    :param kwargs:
+    :return: Publisher
+    """
     if instance:
         setattrs(instance, **kwargs, updated_at=datetime.utcnow(), ignore_nulls=True)
     else:

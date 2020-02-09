@@ -3,7 +3,7 @@ from lib.utils import get_random_str
 
 from app.publishers.models import Publisher
 from app.users.constants import ROLE_ADMIN, ROLE_USER
-
+from tests.helpers import add_publisher
 
 endpoint = 'publishers.update_publisher_view'
 
@@ -13,7 +13,7 @@ endpoint = 'publishers.update_publisher_view'
     (get_random_str(), get_random_str(), None,),
     (get_random_str(), get_random_str(), 10.5,),
 ])
-def test_default(client, add_user, add_publisher, name, comment, airtime):
+def test_default(client, add_user, name, comment, airtime):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     publisher = add_publisher()
@@ -28,7 +28,7 @@ def test_default(client, add_user, add_publisher, name, comment, airtime):
     )
     assert 'id' in resp
     assert resp['id'] == publisher.id
-    updated_publisher = Publisher.query.filter_by(id=resp['id']).one_or_none()
+    updated_publisher = Publisher.query.get(resp['id'])
     assert updated_publisher
 
     assert 'name' in resp
@@ -41,7 +41,7 @@ def test_default(client, add_user, add_publisher, name, comment, airtime):
     assert updated_publisher.airtime == airtime == resp['airtime']
 
 
-def test_no_params_failure(client, add_user, add_publisher):
+def test_no_params_failure(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     publisher = add_publisher()
@@ -78,7 +78,7 @@ def test_no_params_failure(client, add_user, add_publisher):
     (get_random_str(), get_random_str(), -.5, 'airtime'),
 
 ])
-def test_malformed_params_failure(client, add_user, add_publisher, name, comment, airtime, param_name):
+def test_malformed_params_failure(client, add_user, name, comment, airtime, param_name):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     publisher = add_publisher()

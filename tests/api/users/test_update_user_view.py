@@ -29,7 +29,7 @@ def test_default(client, add_user, name, role, email):
     )
     assert 'id' in resp
     assert resp['id'] == user.id
-    new_user = User.query.filter_by(id=resp['id']).one_or_none()
+    new_user = User.query.get(resp['id'])
     assert new_user
 
     for var_name in ('name', 'email', 'role'):

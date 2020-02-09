@@ -1,9 +1,18 @@
 import os
 
+SERVER_NAME = os.environ.get("SERVER_NAME")
+
 SESSION_COOKIE_NAME = 'session'
 SESSION_COOKIE_PATH = '/'
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+SESSION_COOKIE_DOMAIN = SERVER_NAME
+
+AUTH_COOKIE_NAME = os.environ.get("AUTH_COOKIE_NAME", 'SID')
+AUTH_TOKEN_HEADER_NAME = os.environ.get("AUTH_TOKEN_HEADER_NAME", 'auth-token')
+
 WTF_CSRF_ENABLED = False
+
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 UPLOAD_DIR = 'static/upload'
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
@@ -18,13 +27,8 @@ SQLALCHEMY_DATABASE_URI = f'postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASS
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "WERTGbhygF#$%^&*(*&^%$EDFGBN")
 
-SERVER_NAME = os.environ.get("SERVER_NAME")
-SESSION_COOKIE_DOMAIN = SERVER_NAME
-
 REDIS_HOST = os.environ.get("REDIS_HOST", "indoor-redis")
 REDIS_PORT = os.environ.get("REDIS_PORT", 6379)
-
-AUTH_COOKIE_NAME = os.environ.get("AUTH_COOKIE_NAME", 'SID')
 
 SWAGGER_USERNAME = os.environ.get('SWAGGER_USERNAME')
 SWAGGER_PASSWORD = os.environ.get('SWAGGER_PASSWORD')

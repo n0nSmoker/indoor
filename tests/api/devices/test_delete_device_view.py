@@ -1,30 +1,30 @@
-from app.users.models import User
+from app.devices.models import Device
 from app.users.constants import ROLE_USER, ROLE_ADMIN
+from tests.helpers import add_device
 
-
-endpoint = 'users.delete_user_view'
+endpoint = 'devices.delete_device_view'
 
 
 def test_default(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
-    user = add_user()
+    device = add_device()
     resp = client.delete(
         endpoint=endpoint,
-        user_id=user.id,
+        device_id=device.id,
     )
     assert 'id' in resp
-    assert resp['id'] == user.id
-    assert not User.query.get(resp['id'])
+    assert resp['id'] == device.id
+    assert not Device.query.get(resp['id'])
 
 
 def test_not_admin_failure(client, add_user):
     _ = add_user(role=ROLE_USER, log_him_in=True)
 
-    user = add_user()
+    device = add_device()
     _ = client.delete(
         endpoint=endpoint,
-        user_id=user.id,
+        device_id=device.id,
         check_status=403
     )
 
@@ -32,10 +32,10 @@ def test_not_admin_failure(client, add_user):
 def test_wrong_id_failure(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
-    user = add_user()
+    device = add_device()
     _ = client.delete(
         endpoint=endpoint,
-        user_id=129129129129192,
+        device_id=129129129129192,
         check_status=404
     )
-    assert User.query.get(user.id)
+    assert Device.query.get(device.id)

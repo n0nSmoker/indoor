@@ -9,6 +9,7 @@ from lib.utils import ApiException, find_models_and_tables
 from lib.auth.manager import AuthManager
 
 from app.users.utils import get_user_by_id
+from app.devices.utils import get_device_by_token
 
 
 logging.basicConfig(
@@ -20,7 +21,7 @@ logging.basicConfig(
 
 app = create_app(name='indoor')
 init_app(app)
-AuthManager(app, get_user_func=get_user_by_id)
+AuthManager(app, get_user_func=get_user_by_id, get_device_func=get_device_by_token)
 
 # Register specs and SwaggerUI
 register_swagger(
@@ -32,6 +33,11 @@ register_swagger(
             "type": "apiKey",
             "in": "cookie",
             "name": app.config['AUTH_COOKIE_NAME']
+        },
+        "tokenAuth": {
+            "type": "apiKey",
+            "in": "header",
+            "name": app.config['AUTH_TOKEN_HEADER_NAME']
         }
     },
     username=app.config.get('SWAGGER_USERNAME'),

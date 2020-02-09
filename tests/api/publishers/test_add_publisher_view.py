@@ -31,7 +31,7 @@ def test_default(client, add_user, name, comment, airtime):
         )
     )
     assert 'id' in resp
-    publisher = Publisher.query.filter_by(id=resp['id']).one_or_none()
+    publisher = Publisher.query.get(resp['id'])
     assert publisher
 
     assert publisher.name == name
@@ -62,7 +62,7 @@ def test_duplicate_name_failure(client, add_user):
         )
     )
     assert 'id' in resp
-    publisher = Publisher.query.filter_by(id=resp['id']).one_or_none()
+    publisher = Publisher.query.get(resp['id'])
     assert publisher
     assert publisher.name == name
 

@@ -26,7 +26,7 @@ def test_default(client, add_user, role):
         )
     )
     assert 'id' in resp
-    instance = User.query.filter_by(id=resp['id']).one_or_none()
+    instance = User.query.get(resp['id'])
     assert instance
 
     assert instance.name == name
@@ -49,7 +49,7 @@ def test_default_role(client, add_user):
         )
     )
     assert 'id' in resp
-    instance = User.query.filter_by(id=resp['id']).one_or_none()
+    instance = User.query.get(resp['id'])
     assert instance
 
     assert instance.name == name
@@ -86,7 +86,7 @@ def test_duplicate_email_failure(client, add_user):
         )
     )
     assert 'id' in resp
-    instance = User.query.filter_by(id=resp['id']).one_or_none()
+    instance = User.query.get(resp['id'])
     assert instance
     assert instance.email == email
 

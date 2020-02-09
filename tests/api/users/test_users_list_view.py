@@ -7,16 +7,18 @@ endpoint = 'users.users_list_view'
 
 
 def test_default(client, add_user):
-    _ = add_user(role=ROLE_ADMIN, log_him_in=True)
-    user = add_user(role=ROLE_USER, log_him_in=False)
+    u1 = add_user(role=ROLE_ADMIN, log_him_in=True)
+    u2 = add_user(role=ROLE_USER, log_him_in=False)
     resp = client.get(
         endpoint=endpoint
     )
     assert 'total' in resp
-    assert resp['total'] > 0
+    assert resp['total'] == 2
     assert 'results' in resp
-    assert any([r['id'] == user.id for r in resp['results']])
+    assert len(resp['results']) == 2
+    assert {u1.id, u2.id} == {r['id'] for r in resp['results']}
     assert 'password' not in resp['results'][0]
+    assert 'password' not in resp['results'][1]
 
 
 def test_not_admin_failure(client, add_user):

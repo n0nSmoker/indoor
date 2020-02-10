@@ -5,6 +5,7 @@ from sqlalchemy import UniqueConstraint
 
 from lib.factory import db
 from lib.utils import get_random_str
+from app.locations.models import Location
 from .constants import UNAPPROVED
 
 
@@ -17,7 +18,7 @@ class Device(db.Model):
     status = db.Column(db.String(50), index=True, default=UNAPPROVED)
 
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id', ondelete='CASCADE'))
-    location = db.relationship('Location', foreign_keys=[location_id], uselist=False, lazy='joined')
+    location = db.relationship(Location, foreign_keys=[location_id], uselist=False, lazy='joined')
 
     contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id', ondelete='SET NULL'))
     contact = db.relationship('Contact', foreign_keys=[contact_id], uselist=False, lazy='joined')

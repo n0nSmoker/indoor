@@ -40,6 +40,22 @@ def test_default(client, add_user, name, tel, comment):
     assert resp['comment'] == contact.comment == comment
 
 
+def test_not_admin_failure(client, add_user):
+    _ = add_user(role=ROLE_USER, log_him_in=True)
+
+    resp = client.post(
+        endpoint=endpoint,
+        data=dict(
+            name=get_random_str(),
+            tel=get_random_str(),
+            comment=get_random_str(),
+        ),
+        check_status=403
+    )
+    assert 'errors' in resp
+    assert len(resp['errors']) == 1
+
+
 @pytest.mark.parametrize("name,tel,comment", [
     (None, get_random_str(), get_random_str()),
     (get_random_str(), None, get_random_str()),

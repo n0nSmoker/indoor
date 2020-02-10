@@ -226,6 +226,8 @@ def add_contact_view(**kwargs):
     post:
       tags:
         - Devices contacts
+      security:
+        - cookieAuth: []
       requestBody:
         content:
           schema: AddContactSchema

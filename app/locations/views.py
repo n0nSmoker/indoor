@@ -73,6 +73,7 @@ def locations_list_view(page, limit, sort_by, query):
 
 
 @mod.route('/', methods=['POST'])
+@admin_required
 @parser.use_kwargs(AddLocationSchema())
 def add_location_view(**kwargs):
     """Add new location.
@@ -80,6 +81,8 @@ def add_location_view(**kwargs):
     post:
       tags:
         - Locations
+      security:
+        - cookieAuth: []
       requestBody:
         content:
           schema: AddLocationSchema
@@ -207,6 +210,7 @@ def cities_list_view(page, limit, sort_by, query):
 
 
 @mod.route('/cities/', methods=['POST'])
+@admin_required
 @parser.use_kwargs(AddCitySchema())
 def add_city_view(**kwargs):
     """Add new city.
@@ -214,6 +218,8 @@ def add_city_view(**kwargs):
     post:
       tags:
         - Cities
+      security:
+        - cookieAuth: []
       requestBody:
         content:
           schema: AddCitySchema

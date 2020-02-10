@@ -4,7 +4,7 @@ from tests.helpers import add_publisher
 endpoint = 'publishers.publisher_by_id_view'
 
 
-def test_default(client, add_user, add_publisher):
+def test_default(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 
     publisher = add_publisher()

@@ -1,11 +1,12 @@
 import pytest
 from datetime import datetime, timedelta
 from lib.utils import get_random_str
+from tests.helpers import add_device_health
 
 endpoint = 'system.devices_health_list_view'
 
 
-def test_default(client, add_device_health):
+def test_default(client):
     device_health = add_device_health()
 
     resp = client.get(
@@ -17,7 +18,7 @@ def test_default(client, add_device_health):
     assert any([r['id'] == device_health.id for r in resp['results']])
 
 
-def test_filter_by_id(client, add_device_health):
+def test_filter_by_id(client):
     device_health_first = add_device_health(device_id='1')
     device_health_second = add_device_health(device_id='2')
 
@@ -33,7 +34,7 @@ def test_filter_by_id(client, add_device_health):
     assert all([r['device_id'] != device_health_second.device_id for r in resp['results']])
 
 
-def test_filter_by_date_range(client, add_device_health):
+def test_filter_by_date_range(client):
     date_time_now = datetime.utcnow()
     date_time_future = date_time_now + timedelta(days=5)
     date_time_past = date_time_now - timedelta(days=5)

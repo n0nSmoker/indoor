@@ -2,11 +2,12 @@ from flask import Blueprint
 from sqlalchemy import or_
 
 from app.locations.models import Location
+from app.common.decorators import admin_required, auth_required
+
 from lib.factory import db
 from lib.utils import success, fail
 from lib.webargs import parser
 
-from app.common.decorators import admin_required, auth_required
 
 from .models import Device, Contact, ContactException
 from .schemas import (

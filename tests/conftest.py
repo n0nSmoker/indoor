@@ -4,6 +4,10 @@ from app.devices.utils import get_device_by_token
 from app.users.utils import get_user_by_id, save_user
 from app.users.constants import ROLE_USER
 
+from app.publishers.utils import save_publisher
+
+from app.system.utils import save_device_health
+
 from lib.auth.manager import AuthManager
 from lib.factory import create_app, create_db, create_tables, drop_db, init_app
 from lib.utils import get_random_str

@@ -1,6 +1,7 @@
 from app.devices.utils import save_device, save_contact
 from app.locations.utils import save_city, save_location
 from app.publishers.utils import save_publisher
+from app.system.utils import save_device_health
 from lib.utils import get_random_str
 
 
@@ -34,4 +35,12 @@ def add_publisher(name=None, comment=None, airtime=None, created_by=None):
         comment=comment,
         airtime=airtime,
         created_by=created_by
+    )
+
+
+def add_device_health(device_id=None, software_version=None, created_at=None):
+    return save_device_health(
+        device_id=device_id or get_random_str(punctuation=True),
+        software_version=software_version,
+        created_at=created_at
     )

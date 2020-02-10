@@ -48,8 +48,11 @@ def test_not_admin_failure(client, add_user):
 ])
 def test_wrong_params_failure(client, add_user, param, value):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
-    _ = client.get(
+    resp = client.get(
         endpoint=endpoint,
         check_status=400,
         **{param: value}    
     )
+    assert 'errors' in resp
+    assert len(resp['errors']) == 1
+    assert param in resp['errors'][0].lower()

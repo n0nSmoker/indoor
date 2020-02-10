@@ -40,6 +40,22 @@ def test_default(client, add_user, address):
     assert resp['city']['id'] == city.id
 
 
+def test_not_admin_failure(client, add_user):
+    _ = add_user(role=ROLE_USER, log_him_in=True)
+    city = add_city()
+
+    resp = client.post(
+        endpoint=endpoint,
+        data=dict(
+            address=get_random_str(),
+            city_id=city.id
+        ),
+        check_status=403
+    )
+    assert 'errors' in resp
+    assert len(resp['errors']) == 1
+
+
 @pytest.mark.parametrize("address", [
     None,
     '',

@@ -104,7 +104,7 @@ def register_device_view(uid_token):
     ---
     post:
       tags:
-        - Device
+        - Devices
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -225,7 +225,7 @@ def add_contact_view(**kwargs):
     ---
     post:
       tags:
-        - Device contacts
+        - Devices contacts
       requestBody:
         content:
           schema: AddContactSchema

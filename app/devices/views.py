@@ -196,7 +196,7 @@ def delete_contact_view(contact_id):
     ---
     delete:
       tags:
-        - Devices contacts
+        - Contacts
       security:
         - cookieAuth: []
       responses:
@@ -225,7 +225,7 @@ def add_contact_view(**kwargs):
     ---
     post:
       tags:
-        - Devices contacts
+        - Contacts
       security:
         - cookieAuth: []
       requestBody:

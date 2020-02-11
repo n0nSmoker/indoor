@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+    <link rel="shortcut icon" href="/static/img/favicon.ico">
+    <link rel="stylesheet" href="/static/fonts.css">
+    <title>InDoor | Авторизация</title>
+    <style>
+        body {
+            font-family: 'Officina Serif', Roboto, sans-serif;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to bottom right, #2a1b3d, #44318d 59%);
+
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        form {
+            background-color: white;
+            border-radius: 4px;
+            padding: 20px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 500px;
+        }
+        label {
+            margin-bottom: 5px;
+            display: block;
+        }
+        input {
+            width: 100%;
+            max-width: 465px;
+            border: 1px solid hsla(0, 0%, 67%, .45);
+            line-height: 1.2;
+            margin-bottom: 15px;
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 4px;
+            outline: none;
+        }
+        input:focus {
+            border-color: rgba(249, 195, 91, .9);
+        }
+        button {
+            color: white;
+            outline: none;
+            border-color: transparent;
+            background-color: #44318d;
+            padding: 10px 15px;
+            font-weight: 500;
+            line-height: 1.6;
+            border-radius: 4px;
+            cursor: pointer;
+            float: right;
+        }
+        button:hover {
+            background: #2a1b3d;
+        }
+        #error {
+            color: red;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <form onsubmit="onSubmit(event)" name="auth">
+        <div>
+            <label for="email">E-mail</label>
+            <input
+                type="text"
+                name="email"
+                required="required"
+                placeholder="E-mail"
+            />
+        </div>
+        <div>
+            <label for="password">Пароль</label>
+            <input
+                type="password"
+                name="password"
+                required="required"
+                placeholder="Пароль"
+            />
+        </div>
+        <div id="error"></div>
+        <button>Войти</button>
+    </form>
+    <script>
+        function onSubmit(e) {
+            e.preventDefault();
+            var formData = new FormData(document.forms.auth);
+            var xmlHttp = new XMLHttpRequest();
+            var errorContainer = document.getElementById('error');
+
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState === 4) {
+                    if (xmlHttp.status === 200) {
+                        window.location = '/';
+                    } else {
+                        errorContainer.innerText = 'Ошибка авторизации';
+                    }
+                }
+            };
+
+            xmlHttp.open('POST', '/users/login/');
+            xmlHttp.send(formData);
+        }
+    </script>
+</body>
+</html>

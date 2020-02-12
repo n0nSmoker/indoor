@@ -184,7 +184,7 @@ def delete_user_view(user_id):
     return success(UserSchema().dump(user))
 
 
-@mod.route('/login', methods=['POST'])
+@mod.route('/login/', methods=['POST'])
 @parser.use_kwargs(LoginUserSchema())
 def login_user_view(email, password):
     """Login user.
@@ -225,7 +225,7 @@ def login_user_view(email, password):
     )
 
 
-@mod.route('/logout', methods=['POST'])
+@mod.route('/logout/', methods=['POST'])
 @auth_required
 def logout_user_view():
     """Logout user.

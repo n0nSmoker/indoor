@@ -230,7 +230,8 @@ def add_contact_view(**kwargs):
         - cookieAuth: []
       requestBody:
         content:
-          schema: AddContactSchema
+          application/x-www-form-urlencoded:
+            schema: AddContactSchema
       responses:
         200:
           content:

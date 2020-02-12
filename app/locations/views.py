@@ -85,7 +85,8 @@ def add_location_view(**kwargs):
         - cookieAuth: []
       requestBody:
         content:
-          schema: AddLocationSchema
+          application/x-www-form-urlencoded:
+            schema: AddLocationSchema
       responses:
         200:
           content:
@@ -115,7 +116,8 @@ def update_location_view(location_id, **kwargs):
         - cookieAuth: []
       requestBody:
         content:
-          schema: UpdateLocationSchema
+          application/x-www-form-urlencoded:
+            schema: UpdateLocationSchema
       responses:
         200:
           content:
@@ -222,7 +224,8 @@ def add_city_view(**kwargs):
         - cookieAuth: []
       requestBody:
         content:
-          schema: AddCitySchema
+          application/x-www-form-urlencoded:
+            schema: AddCitySchema
       responses:
         200:
           content:
@@ -255,7 +258,8 @@ def update_city_view(city_id, **kwargs):
         - cookieAuth: []
       requestBody:
         content:
-          schema: UpdateCitySchema
+          application/x-www-form-urlencoded:
+            schema: UpdateCitySchema
       responses:
         200:
           content:

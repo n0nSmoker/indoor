@@ -89,7 +89,7 @@ export default function ResponsiveTable({
                           className={classes.actionBtn}
                           size="small"
                           color={action.color}
-                          onClick={action.onClick}
+                          onClick={() => action.onClick(row)}
                         >
                           {action.title}
                         </Button>

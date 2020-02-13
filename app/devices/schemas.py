@@ -63,3 +63,10 @@ class UpdateDeviceSchema(ma.Schema):
     location_id = fields.Int(validate=Range(min=1), missing=None)
     status = fields.Str(validate=OneOf(choices=dict(DEVICE.STATUSES).values()), missing=None)
     comment = fields.Str(validate=Length(max=255), missing=None)
+
+
+class UpdateContactSchema(ma.Schema):
+    name = fields.Str(validate=Length(min=5, max=255), required=True)
+    tel = fields.Str(validate=Length(min=10, max=255), required=True)
+    comment = fields.Str(validate=Length(max=1024), missing=None)
+

@@ -38,6 +38,7 @@ def test_default(client, add_user):
 def test_not_admin_failure(client, add_user):
     _ = add_user(role=ROLE_USER, log_him_in=True)
     contact_id = add_contact().id
+
     resp = client.put(
         endpoint=endpoint,
         contact_id=contact_id,

@@ -248,6 +248,7 @@ def update_contact_view(contact_id, **kwargs):
     contact = save_contact(contact, **kwargs)
     return success(ContactSchema().dump(contact))
 
+
 @mod.route('/contacts/', methods=['POST'])
 @admin_required
 @parser.use_kwargs(AddContactSchema())

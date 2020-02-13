@@ -16,7 +16,7 @@ from .schemas import (
     DeviceSchema,
     DeviceListSchema,
     RegisterDeviceSchema,
-    RegisteredDeviceSchema, ContactSchema, AddContactSchema)
+    RegisteredDeviceSchema, ContactSchema, AddContactSchema, UpdateContactSchema)
 from .utils import save_device, save_contact
 
 
@@ -217,6 +217,37 @@ def delete_contact_view(contact_id):
     return success(ContactSchema().dump(contact))
 
 
+@mod.route('/contacts/<int:contact_id>/', methods=['PUT'])
+@admin_required
+@parser.use_kwargs(UpdateContactSchema())
+def update_contact_view(contact_id, **kwargs):
+    """Update contact.
+    ---
+    put:
+      tags:
+        - Devices contacts
+      security:
+        - cookieAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema: UpdateContactSchema
+      responses:
+        200:
+          content:
+            application/json:
+              schema: ContactSchema
+        403:
+          description: Forbidden
+        404:
+          description: No such item
+        5XX:
+          description: Unexpected error
+    """
+    contact = Contact.query.get_or_404(contact_id)
+    contact = save_contact(contact, **kwargs)
+    return success(ContactSchema().dump(contact))
+
 @mod.route('/contacts/', methods=['POST'])
 @admin_required
 @parser.use_kwargs(AddContactSchema())
@@ -230,7 +261,8 @@ def add_contact_view(**kwargs):
         - cookieAuth: []
       requestBody:
         content:
-          schema: AddContactSchema
+          application/x-www-form-urlencoded:
+            schema: AddContactSchema
       responses:
         200:
           content:

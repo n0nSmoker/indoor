@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import request
-from lib.auth.manager import current_user
+from lib.auth.manager import current_device, current_user
 from lib.utils import fail
 
 
@@ -55,6 +55,21 @@ def check_auth(roles=None):
         @wraps(fn)
         def wrapped(*args, **kwargs):
             if not current_user or roles and current_user.role not in roles:
+                return fail('Доступ запрещен', status=403)
+            return fn(*args, **kwargs)
+        return wrapped
+    return wrapper
+
+
+def check_device_auth():
+    """
+    Adds device auth check to view function
+    :return: wrapped function
+    """
+    def wrapper(fn):
+        @wraps(fn)
+        def wrapped(*args, **kwargs):
+            if not current_device:
                 return fail('Доступ запрещен', status=403)
             return fn(*args, **kwargs)
         return wrapped

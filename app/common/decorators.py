@@ -1,4 +1,4 @@
-from lib.auth.decorators import check_auth
+from lib.auth.decorators import check_auth, check_device_auth
 
 from app.users.constants import ROLE_ADMIN
 
@@ -20,4 +20,14 @@ def auth_required(fn):
     :return:
     """
     wrapper = check_auth()
+    return wrapper(fn)
+
+
+def device_auth_required(fn):
+    """
+    Shortcut function to check if device token is valid
+    :param fn:
+    :return:
+    """
+    wrapper = check_device_auth()
     return wrapper(fn)

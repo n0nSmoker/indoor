@@ -1,5 +1,7 @@
 from flask import Blueprint
 
+from app.common.decorators import auth_required, device_auth_required
+from lib.auth.manager import current_device
 from lib.utils import success, fail
 from lib.webargs import parser
 
@@ -14,7 +16,7 @@ mod = Blueprint('system', __name__, url_prefix='/system')
 
 @mod.route('/version/')
 @parser.use_kwargs(OSVersionSchema)
-def current_version_view(os_version):
+def current_version_view(os_name):
     """
     Get last available software version for given OS
     ---
@@ -38,12 +40,13 @@ def current_version_view(os_version):
     """
     return success({
         'version': f'1.13.64',
-        'os_version': os_version,
-        'download_url': f'https://download.software/1.13.64_{os_version.replace(" ", "_")}.file',
+        'os_name': os_name,
+        'download_url': f'https://0.0.0.0/1.13.64_{os_name}.file',
     })
 
 
 @mod.route('/health/')
+@auth_required
 @parser.use_kwargs(FilterDeviceHealthSchema())
 def devices_health_list_view(page, limit, sort_by, device_id, start_date_time, end_date_time):
     """Get list of devices health.
@@ -51,6 +54,8 @@ def devices_health_list_view(page, limit, sort_by, device_id, start_date_time, e
     get:
       tags:
         - System
+      security:
+        - cookieAuth: []
       parameters:
       - in: query
         schema: FilterDeviceHealthSchema
@@ -84,6 +89,7 @@ def devices_health_list_view(page, limit, sort_by, device_id, start_date_time, e
 
 
 @mod.route('/health/', methods=['POST'])
+@device_auth_required
 @parser.use_kwargs(AddDeviceHealthSchema())
 def add_device_health_view(**kwargs):
     """Add device health
@@ -91,6 +97,8 @@ def add_device_health_view(**kwargs):
     post:
       tags:
         - System
+      security:
+        - tokenAuth: []
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -108,8 +116,71 @@ def add_device_health_view(**kwargs):
           description: Unexpected error
     """
     try:
-        device_health = save_device_health(**kwargs)
+        device_health = save_device_health(device_id=current_device.id, **kwargs)
     except DeviceHealthException as e:
         return fail(str(e))
 
     return success(DeviceHealthSchema().dump(device_health))
+
+
+@mod.route('/commands/')
+@device_auth_required
+def commands_view():
+    """Get list of device commands.
+    ---
+    get:
+      tags:
+        - System
+      security:
+        - tokenAuth: []
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+        400:
+          content:
+            application/json:
+              schema: FailSchema
+        5XX:
+          description: Unexpected error
+    """
+    # TODO: get device specified commands list # noqa
+    return success(dict(results=[]))
+
+
+@mod.route('/logs/', methods=['POST'])
+@device_auth_required
+def logs_view():
+    """Save device logs file.
+    ---
+    post:
+      tags:
+        - System
+      security:
+        - tokenAuth: []
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: string
+                example: ok
+        400:
+          content:
+            application/json:
+              schema: FailSchema
+        5XX:
+          description: Unexpected error
+    """
+    # TODO: save logs file somewhere # noqa
+    return success('ok')

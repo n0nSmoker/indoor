@@ -42,9 +42,9 @@ def add_publisher(name=None, comment=None, airtime=None, created_by=None):
     )
 
 
-def add_device_health(device_id=None, software_version=None, created_at=None):
+def add_device_health(device_id, software_version=None, created_at=None):
     return save_device_health(
-        device_id=device_id or get_random_str(punctuation=True),
+        device_id=device_id,
         software_version=software_version,
         created_at=created_at
     )

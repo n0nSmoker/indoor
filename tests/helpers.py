@@ -1,7 +1,11 @@
+from werkzeug.datastructures import FileStorage
+
+from app.content.utils import save_content
 from app.devices.utils import save_device, save_contact
 from app.locations.utils import save_city, save_location
 from app.publishers.utils import save_publisher
 from app.system.utils import save_device_health
+
 from lib.utils import get_random_str
 
 
@@ -43,4 +47,12 @@ def add_device_health(device_id=None, software_version=None, created_at=None):
         device_id=device_id or get_random_str(punctuation=True),
         software_version=software_version,
         created_at=created_at
+    )
+
+
+def add_content(created_by, comment=None):
+    return save_content(
+        file=FileStorage(open('tests/data/FaceImage.jpg', 'rb')),
+        comment=comment or get_random_str(),
+        created_by=created_by
     )

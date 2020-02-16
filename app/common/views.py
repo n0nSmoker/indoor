@@ -11,7 +11,6 @@ mod = Blueprint('common', __name__)
 def root_view(path=None):
     if not current_user:
         return redirect('/login/')
-    # TODO: make it on front
     if not path:
         return redirect('/admin/users/')
     return render_template('index.html')

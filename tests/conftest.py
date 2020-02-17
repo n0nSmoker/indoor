@@ -1,5 +1,7 @@
 import pytest
+from werkzeug.datastructures import FileStorage
 
+from app.content.utils import save_content
 from app.devices.utils import get_device_by_token
 from app.users.utils import get_user_by_id, save_user
 from app.users.constants import ROLE_USER
@@ -30,7 +32,6 @@ def app(request):
     dsn = test_app.config['SQLALCHEMY_DATABASE_URI']
     drop_db(dsn)
     create_db(dsn)
-    
     # Establish an application context before running the tests.
     ctx = test_app.app_context()
     ctx.push()
@@ -98,6 +99,19 @@ def add_user(client):
             )
 
         return user
+    return func
+
+
+@pytest.fixture(scope='function')
+def add_content():
+    """Create new Content for test_update_content_view"""
+    def func(created_by):
+        file = FileStorage(open('tests/data/FaceImage.jpg', 'rb'))
+        return save_content(
+            comment='comment',
+            created_by=created_by,
+            file=file
+            )
     return func
 
 

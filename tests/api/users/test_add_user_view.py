@@ -71,6 +71,31 @@ def test_not_admin_failure(client, add_user):
     )
 
 
+@pytest.mark.parametrize("name,password,email", [
+    ('', '', ''),
+    ('', get_random_str(5), '@new.com',),
+    ('', get_random_str(), f'{get_random_str()}@new.com',),
+    (get_random_str(), '', f'{get_random_str()}@new.com',),
+    (get_random_str(), get_random_str(), '@new.com',),
+    (get_random_str(101), get_random_str(101), f'{get_random_str(256)}@new.com',),
+    (get_random_str(101), get_random_str(), f'{get_random_str()}@new.com',),
+    (get_random_str(), get_random_str(101), f'{get_random_str()}@new.com',),
+    # (get_random_str(), get_random_str(), f'{get_random_str()}@new.com',),
+])
+def test_bad_length_user_data_failure(client, add_user, name, password, email):
+    add_user(role=ROLE_ADMIN, log_him_in=True)
+
+    client.post(
+        endpoint=endpoint,
+        data=dict(
+            name=name,
+            password=password,
+            email=email,
+        ),
+        check_status=400
+    )
+
+
 def test_duplicate_email_failure(client, add_user):
     _ = add_user(role=ROLE_ADMIN, log_him_in=True)
 

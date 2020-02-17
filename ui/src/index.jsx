@@ -9,6 +9,7 @@ import rootReducer from './reducers';
 import runSagas from './sagas';
 import Root from './components/Root';
 import Users from './pages/Users';
+import Publishers from './pages/Publishers';
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));
@@ -20,6 +21,7 @@ render(
       <Root>
         <Switch>
           <Route path="/users/" component={Users} exact />
+          <Route path="/publishers/" component={Publishers} exact />
         </Switch>
       </Root>
     </BrowserRouter>

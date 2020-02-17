@@ -9,6 +9,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import GroupIcon from '@material-ui/icons/Group';
+import MovieIcon from '@material-ui/icons/Movie';
 
 import useStyles from './styles';
 
@@ -38,6 +39,17 @@ export default function AppDrawer({ mobileOpen, handleDrawerToggle }) {
                 <GroupIcon className={classes.listIcon} />
               </ListItemIcon>
               <ListItemText primary="Пользователи" />
+            </ListItem>
+          </NavLink>
+          <NavLink
+            to="/publishers/"
+            className={classes.navLink}
+          >
+            <ListItem button>
+              <ListItemIcon>
+                <MovieIcon className={classes.listIcon} />
+              </ListItemIcon>
+              <ListItemText primary="Рекламодатели" />
             </ListItem>
           </NavLink>
         </List>

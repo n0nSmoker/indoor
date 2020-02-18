@@ -20,7 +20,7 @@ function errorHandler(err) {
 
 export default {
   get: (url, params) => axios.get(url, { params }).catch(errorHandler),
-  post: (url, data) => axios.post(url, data).catch(errorHandler),
-  put: (url, data) => axios.put(url, data).catch(errorHandler),
+  post: (url, data, headers) => axios.post(url, data, { headers: headers }).catch(errorHandler),
+  put: (url, data, headers) => axios.put(url, data, { headers: headers }).catch(errorHandler),
   delete: (url, params) => axios.delete(url, { params }).catch(errorHandler),
 };

@@ -16,7 +16,12 @@ module.exports = env => ({
     path: path.resolve(__dirname, '../static/dist')
   },
   resolve: {
-    extensions: ['*', '.js', '.jsx']
+    extensions: ['*', '.js', '.jsx'],
+    alias: {
+      components: path.resolve(__dirname, 'src/components/'),
+      lib: path.resolve(__dirname, 'src/lib/'),
+      pages: path.resolve(__dirname, 'src/pages/'),
+    },
   },
   module: {
     rules: [

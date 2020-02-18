@@ -1,6 +1,7 @@
 import { all, call, put, select, takeLatest } from 'redux-saga/effects';
 
-import requests from '../../lib/requests';
+import { showNetworkError, showSuccess } from 'components/Notifications/actions';
+import requests from 'lib/requests';
 
 import { fetchUsers } from './actions';
 import {
@@ -22,18 +23,17 @@ function* fetchUsersWorker() {
     const response = yield call(requests.get, '/users/', filters);
     yield put({type: USERS_ACTION_RECEIVE_USERS, users: response.data});
   } catch (e) {
-    // TODO: put notifications action
-    console.error(e);
+    yield put(showNetworkError(e));
   }
 }
 
 function* deleteUsersWorker(action) {
   try {
-    yield call(requests.delete, `/users/${action.payload}`);
-    yield put(fetchUsers())
+    yield call(requests.delete, `/users/${action.payload}/`);
+    yield put(fetchUsers());
+    yield put(showSuccess('Пользователь успешно удален'));
   } catch (e) {
-    // TODO: put notifications action
-    console.error(e);
+    yield put(showNetworkError(e));
   }
 }
 
@@ -45,10 +45,10 @@ function* mutateUsersWorker({ payload: { id, ...formData }, callback}) {
       yield call(requests.post, '/users/', formData)
     }
     yield put(fetchUsers());
+    yield put(showSuccess(`Пользователь успешно ${id ? 'обновлен' : 'добавлен'}`));
     if (callback) callback();
   } catch (e) {
-    // TODO: put notifications action
-    console.error(e);
+    yield put(showNetworkError(e));
   }
 }
 

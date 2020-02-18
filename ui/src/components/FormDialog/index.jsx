@@ -56,6 +56,6 @@ Form.propTypes = {
   title: PropTypes.string,
   handleClose: PropTypes.func,
   handleSubmit: PropTypes.func,
-  children: React.ReactNode,
+  children: PropTypes.node,
   isValid: PropTypes.bool,
 };

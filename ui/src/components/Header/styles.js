@@ -14,10 +14,29 @@ const HeaderStyles = makeStyles(theme => ({
     },
   },
   menuButton: {
-    marginRight: 'auto',
     [theme.breakpoints.up('sm')]: {
       display: 'none',
     },
+  },
+  addButton: {
+    marginLeft: theme.spacing(3),
+    fontWeight: 'bold',
+  },
+  grow: {
+    flexGrow: 1,
+  },
+  search: {
+    width: 270,
+    marginRight: theme.spacing(3),
+  },
+  searchInputRoot: {
+    padding: `0 ${theme.spacing(1)}px`,
+  },
+  searchInput: {
+    padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`
+  },
+  searchClose: {
+    cursor: 'pointer',
   },
 }));
 

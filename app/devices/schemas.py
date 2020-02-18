@@ -69,4 +69,3 @@ class UpdateContactSchema(ma.Schema):
     name = fields.Str(validate=Length(min=5, max=255), required=True)
     tel = fields.Str(validate=Length(min=10, max=255), required=True)
     comment = fields.Str(validate=Length(max=1024), missing=None)
-

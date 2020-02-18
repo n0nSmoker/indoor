@@ -21,7 +21,7 @@ const useStyles = makeStyles({
     backgroundColor: 'white',
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
-    maxHeight: 'calc(100vh - 220px)',  // TODO: fix it, make dynamic
+    maxHeight: 'calc(100vh - 230px)',  // TODO: fix it, make dynamic
   },
   headCell: {
     backgroundColor: 'white',

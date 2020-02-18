@@ -1,5 +1,7 @@
 export const USERS_ACTION_FETCH_USERS = 'users:fetch';
 export const USERS_ACTION_RECEIVE_USERS = 'users:receive';
+export const USERS_ACTION_DELETE_USERS = 'users:delete';
+export const USERS_ACTION_MUTATE_USERS = 'users:mutate';
 export const USERS_ACTION_SET_FILTERS = 'users:setFilters';
 
 export const USERS_ROLE_ADMIN = 'Admin';

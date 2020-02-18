@@ -3,16 +3,8 @@ import axios from 'axios';
 
 function errorHandler(err) {
   const { response } = err;
-  switch (response.status) {
-    case 403:
+  if (response.status === 403) {
       window.location = '/';
-      break;
-    case 400:
-      console.dir(response.data);
-      break;
-    default:
-      // TODO: notifications
-      console.dir('Ошибка сервера!');
   }
   throw err;
 }

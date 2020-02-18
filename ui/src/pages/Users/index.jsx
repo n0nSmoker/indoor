@@ -1,24 +1,35 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 
 import Table from '../../components/ResponsiveTable';
-import requests from '../../lib/requests';
+import { setHeader as setHeaderAction } from '../../components/Header/actions';
 
 import {
   fetchUsers as fetchUsersAction,
   setFilters as setFiltersAction,
+  deleteUser as deleteUserAction,
+  mutateUsers as mutateUsersAction,
 } from './actions';
-import { getRoleTitle, getStatusTitle } from './helpers';
+import { getRoleTitle, getStatusTitle, rolesOptions, statusOptions } from './helpers';
 import Form from './components/Form';
 
 
 const styles = theme => ({
-  controls: {
+  filters: {
     marginBottom: theme.spacing(2),
+    display: 'flex',
+    justifyContent: 'flex-end',
+    '& > *:not(:last-child)': {
+      marginRight: theme.spacing(3),
+    }
   },
+  filterSelect: {
+    minWidth: 100,
+  }
 });
 
 
@@ -63,10 +74,42 @@ class Users extends React.Component {
       color: 'secondary',
     },
   ];
+  filterControls = [
+    {
+      key: 'status',
+      label: 'Статус',
+      options: statusOptions,
+    },
+    {
+      key: 'role',
+      label: 'Роль',
+      options: rolesOptions,
+    },
+  ];
 
   componentDidMount() {
-    const { fetchUsers } = this.props;
+    const { fetchUsers, setHeader } = this.props;
+    setHeader({
+      title: 'Пользователи',
+      addBtn: {
+        onClick: this.showForm,
+        text: 'Добавить пользователя'
+      },
+      search: {
+        placeholder: 'Поиск по пользователям',
+        onSearch: (value) => {
+          if (!value || 2 < value.length) {
+            fetchUsers();
+          }
+        },
+      },
+    });
     fetchUsers();
+  }
+
+  componentWillUnmount() {
+    const { setHeader } = this.props;
+    setHeader({});
   }
 
   handleFiltersChange = (filters) => {
@@ -85,6 +128,11 @@ class Users extends React.Component {
     this.handleFiltersChange({ ...filters, limit, page: 1 })
   };
 
+  setFilter = ({ target: { name, value }}) => {
+    const { filters } = this.props;
+    this.handleFiltersChange({ ...filters, [name]: value || null })
+  };
+
   showForm = (data=null) => {
     this.setState(({ form, ...rest }) => ({
       ...rest, form: { open: true, data }
@@ -100,24 +148,15 @@ class Users extends React.Component {
   // TODO: move to saga
   handleFormSubmit = (formData) => {
     const { form: { data } } = this.state;
-    const { fetchUsers } = this.props;
-    let func;
-    if (data && data.id) {
-      func = requests.put(`/users/${data.id}/`, formData)
-    } else {
-      func = requests.post('/users/', formData)
-    }
-    func.then(() => {
-      fetchUsers();
-      this.hideForm();
-    })
+    const { mutateUsers } = this.props;
+    mutateUsers({...formData, id: data.id}, this.hideForm);
   };
 
   deleteUser = (user) => {
-    const { fetchUsers } = this.props;
+    const { deleteUser } = this.props;
     // TODO: make confirm dialog
     if (confirm(`Удалить пользователя ${user.name}?`)) {
-      requests.delete(`/users/${user.id}/`).then(fetchUsers);
+      deleteUser(user.id);
     }
   };
 
@@ -132,14 +171,29 @@ class Users extends React.Component {
             handleClose={this.hideForm}
             handleSubmit={this.handleFormSubmit}
           />}
-        <div className={classes.controls}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={this.showForm}
-          >
-            Добавить
-          </Button>
+        <div className={classes.filters}>
+          {this.filterControls.map(control => (
+            <TextField
+              key={control.key}
+              select
+              SelectProps={{ displayEmpty: true }}
+              InputLabelProps={{ shrink: true }}
+              label={control.label}
+              className={classes.filterSelect}
+              name={control.key}
+              onChange={this.setFilter}
+              value={filters[control.key] || ''}
+            >
+              <MenuItem value="">
+                Все
+              </MenuItem>
+              {control.options.map(option => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          ))}
         </div>
         <Table
           items={users}
@@ -163,6 +217,9 @@ Users.propTypes = {
   total: PropTypes.number.isRequired,
   fetchUsers: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
+  deleteUser: PropTypes.func.isRequired,
+  mutateUsers: PropTypes.func.isRequired,
+  setHeader: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ usersReducer }) => ({ ...usersReducer });
@@ -170,6 +227,9 @@ const mapStateToProps = ({ usersReducer }) => ({ ...usersReducer });
 const mapDispatchToProps = {
   fetchUsers: fetchUsersAction,
   setFilters: setFiltersAction,
+  deleteUser: deleteUserAction,
+  mutateUsers: mutateUsersAction,
+  setHeader: setHeaderAction,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Users));

@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import Table from 'components/ResponsiveTable';
 import { setHeader as setHeaderAction } from 'components/Header/actions';
 
+import { convertDate } from 'lib/utils';
+
 import {
   fetchPublishers as fetchPublishersAction,
   setFilters as setFiltersAction,
@@ -39,7 +41,8 @@ class Publishers extends React.Component {
     {
       key: 'created_at',
       title: 'Дата создания',
-    }
+      getValue: item => convertDate(item.created_at),
+    },
   ];
   actions = [
     {

@@ -1,17 +1,15 @@
 import React from 'react';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core';
 
 import Table from '../../components/ResponsiveTable';
+import { setHeader as setHeaderAction } from 'components/Header/actions';
 
+import { convertDate } from 'lib/utils';
 import {
   fetchContent as fetchContentAction,
   setFilters as setFiltersAction,
-  addContent as addContentAction,
-  updateContent as updateContentAction,
+  mutateContent as mutateContentAction,
   deleteContent as deleteContentAction,
 } from './actions.js';
 
@@ -50,7 +48,8 @@ class Content extends React.Component {
     {
       key: 'created_at',
       title: 'Дата создания',
-    }
+      getValue: item => convertDate(item.created_at),
+    },
   ];
   actions = [
     {
@@ -68,8 +67,28 @@ class Content extends React.Component {
   ];
 
   componentDidMount() {
-    const { fetchContent } = this.props;
+    const { fetchContent, setHeader } = this.props;
+    setHeader({
+      title: 'Контент',
+      addBtn: {
+        onClick: this.showForm,
+        text: 'Добавить контент',
+      },
+      search: {
+        placeholder: 'Поиск по контенту',
+        onSearch: (value) => {
+          if (!value || 2 < value.length) {
+            fetchContent();
+          }
+        },
+      },
+    });
     fetchContent();
+  }
+
+  componentWillUnmount() {
+    const { setHeader } = this.props;
+    setHeader({});
   }
 
   handleFiltersChange = (filters) => {
@@ -102,36 +121,24 @@ class Content extends React.Component {
 
   handleFormSubmit = (formData) => {
     const { form: { data } } = this.state;
-    const { fetchContent, addContent, updateContent } = this.props;
-    const newFromData = new FormData();
-    newFromData.set('comment', formData.comment);
-    newFromData.append('file', formData.file);
-    if (data && data.id) {
-      updateContent(newFromData, data.id, () => {
-        fetchContent();
-        this.hideForm();
-      })
-    } else {
-      addContent(newFromData, () => {
-        fetchContent();
-        this.hideForm();
-      })
-    }
+    const { mutateContent } = this.props;
+    const newFormData = new FormData();
+    newFormData.set('comment', formData.comment);
+    newFormData.append('file', formData.file);
+    mutateContent({formData: newFormData, id: data.id}, this.hideForm);
   };
 
   deleteContent = (content) => {
-    const { fetchContent, deleteContent } = this.props;
+    const { deleteContent } = this.props;
     // TODO: make confirm dialog
     if (confirm(`Удалить контент ${content.name}`)) {
-      deleteContent(content.id, () => {
-        fetchContent()
-      })
+      deleteContent(content.id);
     }
   };
 
   render() {
     const { form } = this.state;
-    const { classes, content, filters, total } = this.props;
+    const { content, filters, total } = this.props;
     return (
       <>
         {form.open &&
@@ -140,14 +147,6 @@ class Content extends React.Component {
             handleClose={this.hideForm}
             handleSubmit={this.handleFormSubmit} />
         }
-        <div className={classes.controls}>
-          <Button
-            variant='contained'
-            color='primary'
-            onClick={this.showForm}>
-            Добавить контент
-          </Button>
-        </div>
         <Table
           items={content}
           columns={this.columns}
@@ -169,10 +168,9 @@ Content.propTypes = {
   total: PropTypes.number.isRequired,
   fetchContent: PropTypes.func.isRequired,
   setFilters: PropTypes.func.isRequired,
-  addContent: PropTypes.func.isRequired,
-  updateContent: PropTypes.func.isRequired,
+  mutateContent: PropTypes.func.isRequired,
   deleteContent: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
+  setHeader: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ contentReducer }) => ({ ...contentReducer });
@@ -180,9 +178,9 @@ const mapStateToProps = ({ contentReducer }) => ({ ...contentReducer });
 const mapDispatchToProps = {
   fetchContent: fetchContentAction,
   setFilters: setFiltersAction,
-  addContent: addContentAction,
-  updateContent: updateContentAction,
+  mutateContent: mutateContentAction,
   deleteContent: deleteContentAction,
+  setHeader: setHeaderAction,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Content));
+export default connect(mapStateToProps, mapDispatchToProps)(Content);

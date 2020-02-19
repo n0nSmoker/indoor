@@ -40,3 +40,17 @@ export function getStatusTitle(name) {
       return USERS_STATUS_ARCHIVE_TITLE;
   }
 }
+
+export const rolesOptions = [
+  { value: USERS_ROLE_USER, label: USERS_ROLE_USER_TITLE },
+  { value: USERS_ROLE_MANAGER, label: USERS_ROLE_MANAGER_TITLE },
+  { value: USERS_ROLE_ADMIN, label: USERS_ROLE_ADMIN_TITLE },
+];
+
+
+export const statusOptions = [
+  { value: USERS_STATUS_ACTIVE, label: USERS_STATUS_ACTIVE_TITLE },
+  { value: USERS_STATUS_DISABLED, label: USERS_STATUS_DISABLED_TITLE },
+  { value: USERS_STATUS_DELETED, label: USERS_STATUS_DELETED_TITLE },
+  { value: USERS_STATUS_ARCHIVE, label: USERS_STATUS_ARCHIVE_TITLE },
+];

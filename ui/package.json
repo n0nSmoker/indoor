@@ -1,6 +1,6 @@
 {
   "name": "indoor-admin-ui",
-  "version": "2.20.02.003",
+  "version": "2.20.02.004",
   "description": "InDoor Admin Panel",
   "scripts": {
     "dev": "webpack --watch",

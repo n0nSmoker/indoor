@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import FormDialog from '../../../../components/FormDialog';
 
-import { roles } from './helpers';
+import { rolesOptions } from '../../helpers';
 
 
 const useStyles = makeStyles(theme => ({
@@ -37,7 +37,7 @@ export default function Form({ data, handleClose, handleSubmit }) {
   };
 
   const isValid = () => {
-    return formData.name && formData.email && (isEdit || formData.password)
+    return Boolean(formData.name && formData.email && (isEdit || formData.password))
   };
 
   return (
@@ -94,7 +94,7 @@ export default function Form({ data, handleClose, handleSubmit }) {
             native: true,
           }}
         >
-          {roles.map(option => (
+          {rolesOptions.map(option => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

@@ -1,4 +1,5 @@
 from flask import Blueprint, current_app as app, request
+from sqlalchemy import or_
 
 from lib.factory import db
 from lib.utils import success, fail
@@ -18,7 +19,7 @@ mod = Blueprint('users', __name__, url_prefix='/users')
 @mod.route('/')
 @admin_required
 @parser.use_kwargs(FilterUsersSchema())
-def users_list_view(page, limit, sort_by):
+def users_list_view(page, limit, sort_by, query, role, status):
     """Get list of users.
     ---
     get:
@@ -44,8 +45,22 @@ def users_list_view(page, limit, sort_by):
           description: Unexpected error
     """
     q = User.query
-    total = q.count()
 
+    if role:
+        q = q.filter_by(role=role)
+
+    if status:
+        q = q.filter_by(status=status)
+
+    if query:
+        q = q.filter(
+            or_(
+                User.name.ilike(f'%{query}%'),
+                User.email.ilike(f'%{query}%'),
+            )
+        )
+
+    total = q.count()
     q = q.order_by(sort_by).offset((page - 1) * limit).limit(limit)
     return success(UserListSchema().dump(dict(
         results=q,

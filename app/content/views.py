@@ -1,14 +1,13 @@
 from flask import Blueprint
 from sqlalchemy import or_
 
+from app.users.constants import ROLE_ADMIN
+from app.common.decorators import auth_required
 from app.common.utils import delete_file
 from lib.auth.manager import current_user
 from lib.factory import db
 from lib.utils import success, fail
 from lib.webargs import parser
-
-from app.common.decorators import auth_required
-from app.users.constants import ROLE_ADMIN
 
 from .models import File
 from .schemas import (

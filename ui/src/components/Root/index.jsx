@@ -2,8 +2,9 @@ import React from 'react';
 import { ThemeProvider } from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import Header from '../Header';
-import Drawer from '../Drawer';
+import Header from 'components/Header';
+import Drawer from 'components/Drawer';
+import Notifications from 'components/Notifications';
 
 import useStyles from './styles';
 import theme from './theme';
@@ -20,6 +21,7 @@ function Root({ children }) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Notifications />
       <div className={classes.root}>
         <Header handleDrawerToggle={handleDrawerToggle} />
         <Drawer

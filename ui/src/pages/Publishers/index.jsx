@@ -1,26 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Button from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core';
 
-import Table from '../../components/ResponsiveTable';
+import Table from 'components/ResponsiveTable';
+import { setHeader as setHeaderAction } from 'components/Header/actions';
+
+import { convertDate } from 'lib/utils';
 
 import {
   fetchPublishers as fetchPublishersAction,
   setFilters as setFiltersAction,
-  addPublisher as addPublisherAction,
-  updatePublisher as updatePublisherAction,
+  mutatePublisher as mutatePublisherAction,
   deletePublisher as deletePublisherAction,
-} from './actions.js';
+} from './actions';
 
 import Form from './components/Form';
-
-const styles = theme => ({
-  controls: {
-    marginBottom: theme.spacing(2),
-  },
-});
 
 
 class Publishers extends React.Component {
@@ -47,7 +41,8 @@ class Publishers extends React.Component {
     {
       key: 'created_at',
       title: 'Дата создания',
-    }
+      getValue: item => convertDate(item.created_at),
+    },
   ];
   actions = [
     {
@@ -65,8 +60,28 @@ class Publishers extends React.Component {
   ];
 
   componentDidMount() {
-    const { fetchPublishers } = this.props;
+    const { fetchPublishers, setHeader } = this.props;
+    setHeader({
+      title: 'Рекламодатели',
+      addBtn: {
+        onClick: this.showForm,
+        text: 'Добавить рекламодателя',
+      },
+      search: {
+        placeholder: 'Поиск по рекламодателям',
+        onSearch: (value) => {
+          if (!value || 2 < value.length) {
+            fetchPublishers();
+          }
+        },
+      }
+    });
     fetchPublishers();
+  }
+
+  componentWillUnmount() {
+    const { setHeader } = this.props;
+    setHeader({});
   }
 
   handleFiltersChange = (filters) => {
@@ -99,33 +114,21 @@ class Publishers extends React.Component {
 
   handleFormSubmit = (formData) => {
     const { form: { data } } = this.state;
-    const { fetchPublishers, addPublisher, updatePublisher } = this.props;
-    if (data && data.id) {
-      updatePublisher(formData, data.id, () => {
-        fetchPublishers();
-        this.hideForm();
-      })
-    } else {
-      addPublisher(formData, () => {
-        fetchPublishers();
-        this.hideForm();
-      })
-    }
+    const { mutatePublisher } = this.props;
+    mutatePublisher({...formData, id: data.id}, this.hideForm);
   };
 
   deletePublisher = (publisher) => {
-    const { fetchPublishers, deletePublisher } = this.props;
+    const { deletePublisher } = this.props;
     // TODO: make confirm dialog
-    if (confirm(`Удалить рекламодателя ${publisher.name}`)) {
-      deletePublisher(publisher.id, () => {
-        fetchPublishers()
-      })
+    if (confirm(`Удалить рекламодателя ${publisher.name}?`)) {
+      deletePublisher(publisher.id);
     }
   };
 
   render() {
     const { form } = this.state;
-    const { classes, publishers, filters, total } = this.props;
+    const { publishers, filters, total } = this.props;
     return (
       <>
         {form.open &&
@@ -134,14 +137,6 @@ class Publishers extends React.Component {
             handleClose={this.hideForm}
             handleSubmit={this.handleFormSubmit} />
         }
-        <div className={classes.controls}>
-          <Button
-            variant='contained'
-            color='primary'
-            onClick={this.showForm}>
-            Добавить рекламодателя
-          </Button>
-        </div>
         <Table
           items={publishers}
           columns={this.columns}
@@ -163,20 +158,18 @@ Publishers.propTypes = {
   total: PropTypes.number.isRequired,
   fetchPublishers: PropTypes.func.isRequired,
   setFilters: PropTypes.func.isRequired,
-  addPublisher: PropTypes.func.isRequired,
-  updatePublisher: PropTypes.func.isRequired,
   deletePublisher: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
+  setHeader: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ publishersReducer }) => ({ ...publishersReducer });
 
 const mapDispatchToProps = {
   fetchPublishers: fetchPublishersAction,
+  mutatePublisher: mutatePublisherAction,
   setFilters: setFiltersAction,
-  addPublisher: addPublisherAction,
-  updatePublisher: updatePublisherAction,
   deletePublisher: deletePublisherAction,
+  setHeader: setHeaderAction,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Publishers));
+export default connect(mapStateToProps, mapDispatchToProps)(Publishers);

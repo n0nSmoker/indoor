@@ -1,6 +1,7 @@
 from flask import Blueprint
 
 from app.common.decorators import auth_required, device_auth_required
+from app.content.schemas import FileListSchema, File
 from lib.auth.manager import current_device
 from lib.utils import success, fail
 from lib.webargs import parser
@@ -183,4 +184,20 @@ def logs_view():
           description: Unexpected error
     """
     # TODO: save logs file somewhere # noqa
+    return success('ok')
+
+
+@mod.route('/content/')
+@device_auth_required
+def device_content_list_view():
+    # TODO: return device specified files list # noqa
+    return success(FileListSchema().dump(dict(
+        results=File.query.limit(100)
+    )))
+
+
+@mod.route('/content/<int:file_id>/show/', methods=['POST'])
+@device_auth_required
+def device_content_show_view(file_id):  # noqa
+    # TODO: save file show # noqa
     return success('ok')

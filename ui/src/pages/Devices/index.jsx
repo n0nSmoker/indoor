@@ -13,6 +13,7 @@ import {
   setFilters as setFiltersAction,
   fetchLocations as fetchLocationsAction,
   mutateDevices as mutateDevicesAction,
+  mutateLocations as mutateLocationsAction,
 } from './actions';
 
 import { getStatusTitle, statusOptions } from './helpers';
@@ -171,7 +172,13 @@ class Devices extends React.Component {
   handleFormSubmit = (formData) => {
     const { form: { data } } = this.state;
     const { mutateDevices } = this.props;
-    mutateDevices({...formData, id: data.id}, this.hideForm);
+    mutateDevices({ ...formData, id: data.id }, this.hideForm);
+  };
+
+  handleLocationSubmit = (formData, callback) => {
+    const { form: { cityId }} = this.state;
+    const { mutateLocations } = this.props;
+    mutateLocations({ ...formData, city_id: cityId }, callback)
   };
 
   render() {
@@ -188,6 +195,7 @@ class Devices extends React.Component {
             handleClose={this.hideForm}
             handleSubmit={this.handleFormSubmit}
             handleChangeCity={this.handleChangeCity}
+            handleLocationSubmit={this.handleLocationSubmit}
           />}
         <div className={classes.filters}>
           {this.filterControls.map(control => (
@@ -238,6 +246,7 @@ Devices.propTypes = {
   fetchDevices: PropTypes.func.isRequired,
   mutateDevices: PropTypes.func.isRequired,
   fetchLocations: PropTypes.func.isRequired,
+  mutateLocations: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   setHeader: PropTypes.func.isRequired,
 };
@@ -250,6 +259,7 @@ const mapDispatchToProps = {
   setFilters: setFiltersAction,
   setHeader: setHeaderAction,
   fetchLocations: fetchLocationsAction,
+  mutateLocations: mutateLocationsAction,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Devices));

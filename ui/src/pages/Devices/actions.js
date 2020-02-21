@@ -3,6 +3,7 @@ import {
   DEVICES_ACTION_SET_FILTERS,
   DEVICES_ACTION_MUTATE_DEVICES,
   LOCATIONS_ACTION_FETCH_LOCATIONS,
+  LOCATIONS_ACTION_MUTATE_LOCATIONS,
 } from './consts';
 
 
@@ -16,3 +17,8 @@ export const mutateDevices = (deviceData, callback) => ({
 export const setFilters = (filters) => ({ type: DEVICES_ACTION_SET_FILTERS, filters });
 
 export const fetchLocations = cityId => ({ type: LOCATIONS_ACTION_FETCH_LOCATIONS, payload: cityId });
+
+export const mutateLocations = (locationData, callback) => ({
+  type: LOCATIONS_ACTION_MUTATE_LOCATIONS,
+  payload: locationData, callback
+});

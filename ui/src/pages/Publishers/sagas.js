@@ -23,7 +23,6 @@ function* fetchPublishersWorker() {
     const response = yield call(requests.get, '/publishers/', filters);
     yield put({type: PUBLISHERS_ACTION_RECEIVE_PUBLISHERS, publishers: response.data});
   } catch (e) {
-    console.log(e);
     yield put(showNetworkError(e));
   }
 }

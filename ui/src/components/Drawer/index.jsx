@@ -11,6 +11,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import GroupIcon from '@material-ui/icons/Group';
 import MovieIcon from '@material-ui/icons/Movie';
 import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
+import TvIcon from '@material-ui/icons/Tv';
 
 import useStyles from './styles';
 
@@ -62,6 +63,17 @@ export default function AppDrawer({ mobileOpen, handleDrawerToggle }) {
                 <VideoLibraryIcon className={classes.listIcon} />
               </ListItemIcon>
               <ListItemText primary="Контент" />
+            </ListItem>
+          </NavLink>
+          <NavLink
+            to="/devices/"
+            className={classes.navLink}
+          >
+            <ListItem button>
+              <ListItemIcon>
+                <TvIcon className={classes.listIcon} />
+              </ListItemIcon>
+              <ListItemText primary="Устройства" />
             </ListItem>
           </NavLink>
         </List>

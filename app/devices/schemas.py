@@ -18,6 +18,7 @@ class FilterDevicesSchema(FilterSchema):
         missing='created_at'
     )
     query = fields.Str(validate=Length(min=3, max=100), missing=None)
+    status = fields.Str(validate=OneOf(choices=dict(DEVICE.STATUSES).values()), missing=None)
 
 
 class AddContactSchema(ma.Schema):

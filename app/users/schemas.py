@@ -3,16 +3,17 @@ from webargs.fields import ma
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow.validate import Length
 
-from app.common.schemas import FilterSchema, SuccessListSchema
+from app.common.schemas import FilterSchema, SuccessListSchema, sort_one_of
 from app.users.constants import ROLES, ROLE_USER, STATUSES
 from app.users.models import User
 
 
 class FilterUsersSchema(FilterSchema):
     sort_by = fields.Str(
-        validate=validate.OneOf(
-            ['id', 'name', 'email', 'role', 'created_at', 'updated_at']),
-        missing='created_at'
+        validate=sort_one_of([
+            'id', 'name', 'email', 'role', 'status', 'created_at', 'updated_at',
+        ]),
+        missing='-created_at'
     )
     query = fields.Str(validate=Length(min=3, max=100), missing=None)
     role = fields.Str(validate=validate.OneOf([r[0] for r in ROLES]), missing=None)

@@ -15,3 +15,11 @@ class FailSchema(ma.Schema):
 class SuccessListSchema(ma.Schema):
     results = fields.List(fields.Raw())
     total = fields.Number()
+
+
+def sort_one_of(field_names):
+    choices = []
+    for field in field_names:
+        choices.append(field)
+        choices.append(f'-{field}')
+    return validate.OneOf(choices)

@@ -4,7 +4,7 @@ from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import validates, ValidationError
 from marshmallow.validate import Length, Range, OneOf
 
-from app.common.schemas import FilterSchema, SuccessListSchema
+from app.common.schemas import FilterSchema, SuccessListSchema, sort_one_of
 from app.locations.schemas import LocationSchema
 from app.devices.utils import check_token
 from .models import Device, Contact
@@ -13,8 +13,7 @@ from . import constants as DEVICE
 
 class FilterDevicesSchema(FilterSchema):
     sort_by = fields.Str(
-        validate=OneOf(
-            ['id', 'status', 'created_at', 'updated_at']),
+        validate=sort_one_of(['id', 'status', 'comment', 'created_at', 'updated_at']),
         missing='created_at'
     )
     query = fields.Str(validate=Length(min=3, max=100), missing=None)

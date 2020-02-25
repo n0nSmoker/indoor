@@ -10,12 +10,14 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Button from '@material-ui/core/Button';
 
 
 const useStyles = makeStyles({
   paper: {
     borderRadius: 5,
+    cursor: 'default',
   },
   tableContainer: {
     backgroundColor: 'white',
@@ -39,11 +41,104 @@ const useStyles = makeStyles({
   },
 });
 
+
+function getSortObject(sorting) {
+  if (!sorting) return {};
+
+  const isDesc = sorting.charAt(0) === '-';
+  return {
+    direction: isDesc ? 'desc': 'asc',
+    field: isDesc ? sorting.substr(1) : sorting,
+  };
+}
+
+
+function RTHead({ classes, columns, hasActions, sorting, onSortingChange }) {
+  const sort = getSortObject(sorting);
+  const setSorting = field => () => {
+    let isDesc = true;
+    if (field === sort.field && sort.direction === 'desc') {
+      isDesc = false;
+    }
+    onSortingChange(`${isDesc ? '-' : ''}${field}`);
+  };
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell className={cn(classes.serial, classes.headCell)}>№ п/п</TableCell>
+        {columns.map(column => {
+          const isActive = column.sorting === sort.field;
+          return (
+            <TableCell key={column.key} className={classes.headCell}>
+            {column.sorting
+              && (
+                <TableSortLabel
+                  hideSortIcon
+                  direction={sort.direction}
+                  active={isActive}
+                  onClick={setSorting(column.sorting)}
+                >
+                  {column.title}
+                </TableSortLabel>
+              )
+              || column.title
+            }
+          </TableCell>
+          );
+        })}
+        {hasActions &&
+          <TableCell className={classes.headCell}>
+            Действия
+          </TableCell>}
+      </TableRow>
+    </TableHead>
+  );
+}
+
+
+function RTBody({ actions, classes, columns, items }) {
+  return (
+    <TableBody>
+      {items.map((row, index) => {
+        return (
+          <TableRow hover key={row.id}>
+            <TableCell className={classes.serial}>{index + 1}</TableCell>
+            {columns.map(column => {
+              return (
+                <TableCell key={column.key}>
+                  {column.getValue ? column.getValue(row) : row[column.key]}
+                </TableCell>
+              );
+            })}
+            {actions && actions.length &&
+              <TableCell className={classes.actions}>
+                {actions.map(action => (
+                  <Button
+                    key={action.key}
+                    className={classes.actionBtn}
+                    size="small"
+                    color={action.color}
+                    onClick={() => action.onClick(row)}
+                  >
+                    {action.title}
+                  </Button>
+                ))}
+              </TableCell>}
+          </TableRow>
+        );
+      })}
+    </TableBody>
+  );
+}
+
+
 // TODO: make responsive
 export default function ResponsiveTable({
   items,
   columns,
   actions,
+  sorting,
+  onSortingChange,
   page,
   onPageChange,
   limit,
@@ -55,50 +150,19 @@ export default function ResponsiveTable({
     <Paper className={classes.paper}>
       <TableContainer className={classes.tableContainer}>
         <Table stickyHeader>
-          <TableHead>
-            <TableRow>
-              <TableCell className={cn(classes.serial, classes.headCell)}>№ п/п</TableCell>
-              {columns.map(column => (
-                <TableCell key={column.key} className={classes.headCell}>
-                  {column.title}
-                </TableCell>
-              ))}
-              {actions && actions.length &&
-                <TableCell className={classes.headCell}>
-                  Действия
-                </TableCell>}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {items.map((row, index) => {
-              return (
-                <TableRow hover key={row.id}>
-                  <TableCell className={classes.serial}>{index + 1}</TableCell>
-                  {columns.map(column => {
-                    return (
-                      <TableCell key={column.key}>
-                        {column.getValue ? column.getValue(row) : row[column.key]}
-                      </TableCell>
-                    );
-                  })}
-                  {actions && actions.length &&
-                    <TableCell className={classes.actions}>
-                      {actions.map(action => (
-                        <Button
-                          key={action.key}
-                          className={classes.actionBtn}
-                          size="small"
-                          color={action.color}
-                          onClick={() => action.onClick(row)}
-                        >
-                          {action.title}
-                        </Button>
-                      ))}
-                    </TableCell>}
-                </TableRow>
-              );
-            })}
-          </TableBody>
+          <RTHead
+            classes={classes}
+            columns={columns}
+            hasActions={Boolean(actions && actions.length)}
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+          />
+          <RTBody
+            actions={actions}
+            classes={classes}
+            columns={columns}
+            items={items}
+          />
         </Table>
       </TableContainer>
       <TablePagination
@@ -126,6 +190,7 @@ ResponsiveTable.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({
     key: PropTypes.string,
     title: PropTypes.string,
+    sorting: PropTypes.string,
     getValue: PropTypes.func,
   })),
   actions: PropTypes.arrayOf(PropTypes.shape({
@@ -133,6 +198,8 @@ ResponsiveTable.propTypes = {
     title: PropTypes.string,
     onClick: PropTypes.func,
   })),
+  sorting: PropTypes.string,
+  onSortingChange: PropTypes.func,
   page: PropTypes.number,
   onPageChange: PropTypes.func,
   limit: PropTypes.number,

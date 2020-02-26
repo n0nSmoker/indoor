@@ -1,3 +1,5 @@
+from flask import current_app as app
+
 from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
@@ -52,6 +54,17 @@ def save_contact(instance=None, **kwargs):
         db.session.rollback()
         raise ContactException('Duplicate contact')
     return instance
+
+
+def save_command(device_list=None, command=None):
+    """
+    Save log on redis_cache
+    """
+    for device_id in device_list:
+        app.cash.set_command_log(
+            log=command + device_id,
+        )
+    return
 
 
 def check_token(token):

@@ -44,19 +44,23 @@ class Users extends React.Component {
     {
       key: 'name',
       title: 'Имя',
+      sorting: 'name',
     },
     {
       key: 'status',
       title: 'Статус',
+      sorting: 'status',
       getValue: item => getStatusTitle(item.status),
     },
     {
       key: 'email',
       title: 'E-mail',
+      sorting: 'email',
     },
     {
       key: 'role',
       title: 'Роль',
+      sorting: 'role',
       getValue: item => getRoleTitle(item.role),
     },
   ];
@@ -128,6 +132,11 @@ class Users extends React.Component {
     this.handleFiltersChange({ ...filters, limit, page: 1 })
   };
 
+  setSorting = sortBy => {
+    const { filters } = this.props;
+    this.handleFiltersChange({ ...filters, sort_by: sortBy })
+  };
+
   setFilter = ({ target: { name, value }}) => {
     const { filters } = this.props;
     this.handleFiltersChange({ ...filters, [name]: value || null })
@@ -145,7 +154,6 @@ class Users extends React.Component {
     }))
   };
 
-  // TODO: move to saga
   handleFormSubmit = (formData) => {
     const { form: { data } } = this.state;
     const { mutateUsers } = this.props;
@@ -199,6 +207,8 @@ class Users extends React.Component {
           items={users}
           columns={this.columns}
           actions={this.actions}
+          sorting={filters.sort_by}
+          onSortingChange={this.setSorting}
           page={filters.page}
           onPageChange={this.setPage}
           limit={filters.limit}

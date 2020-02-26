@@ -48,10 +48,12 @@ class Devices extends React.Component {
     {
       key: 'id',
       title: 'ID',
+      sorting: 'id',
     },
     {
       key: 'status',
       title: 'Статус',
+      sorting: 'status',
       getValue: item => getStatusTitle(item.status),
     },
     {
@@ -77,6 +79,7 @@ class Devices extends React.Component {
     {
       key: 'comment',
       title: 'Комментарий',
+      sorting: 'comment',
     },
   ];
   actions = [
@@ -130,6 +133,11 @@ class Devices extends React.Component {
   setLimit = (limit) => {
     const { filters } = this.props;
     this.handleFiltersChange({ ...filters, limit, page: 1 })
+  };
+
+  setSorting = sortBy => {
+    const { filters } = this.props;
+    this.handleFiltersChange({ ...filters, sort_by: sortBy })
   };
 
   setFilter = ({ target: { name, value }}) => {
@@ -225,6 +233,8 @@ class Devices extends React.Component {
           items={devices}
           columns={this.columns}
           actions={this.actions}
+          sorting={filters.sort_by}
+          onSortingChange={this.setSorting}
           page={filters.page}
           onPageChange={this.setPage}
           limit={filters.limit}

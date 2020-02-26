@@ -8,7 +8,6 @@ from lib.factory import db
 from lib.utils import success, fail
 from lib.webargs import parser
 
-
 from .models import Device, Contact, ContactException
 from .schemas import (
     FilterDevicesSchema,
@@ -16,9 +15,8 @@ from .schemas import (
     DeviceSchema,
     DeviceListSchema,
     RegisterDeviceSchema,
-    RegisteredDeviceSchema, ContactSchema, AddContactSchema, UpdateContactSchema)
-from .utils import save_device, save_contact
-
+    RegisteredDeviceSchema, ContactSchema, AddContactSchema, UpdateContactSchema, CommandSchema)
+from .utils import save_device, save_contact, save_command
 
 mod = Blueprint('devices', __name__, url_prefix='/devices')
 
@@ -286,3 +284,37 @@ def add_contact_view(**kwargs):
         return fail(str(e))
 
     return success(ContactSchema().dump(contact))
+
+
+@mod.route('/')
+@auth_required
+@parser.use_kwargs(CommandSchema())
+def command_for_devices_view(devices_list, command):
+    """Get list of devices.
+        ---
+        get:
+          tags:
+            - Commands
+          security:
+            - cookieAuth: []
+          parameters:
+          - in: query
+            schema: CommandSchema
+          responses:
+            200:
+              content:
+                application/json:
+                  schema: CommandSchema
+            403:
+              description: Forbidden
+            400:
+              content:
+                application/json:
+                  schema: FailSchema
+            5XX:
+              description: Unexpected error
+        """
+    device_list = devices_list.split(',')
+    device_list = [i for i in device_list if Device.query.get_or_404(i)]
+
+    return save_command(device_list, command)

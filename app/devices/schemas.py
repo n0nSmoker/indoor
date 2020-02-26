@@ -1,4 +1,4 @@
-from webargs import fields
+from webargs import fields, validate
 from webargs.fields import ma
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import validates, ValidationError
@@ -70,3 +70,10 @@ class UpdateContactSchema(ma.Schema):
     name = fields.Str(validate=Length(min=5, max=255), required=True)
     tel = fields.Str(validate=Length(min=10, max=255), required=True)
     comment = fields.Str(validate=Length(max=1024), missing=None)
+
+
+class CommandSchema(ma.Schema):
+    device_list = fields.Str(validate=Length(max=255), missing=None)
+    limit = fields.Int(missing=10, validate=validate.Range(min=1, max=1000))
+    command = fields.Str(validate=validate.OneOf(['show_info', 'restart',
+                                                  'restart_device', 'send_logs']), missing='show_info')

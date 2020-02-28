@@ -37,7 +37,7 @@ class Root extends React.Component {
         <CssBaseline />
         <Notifications />
         {isLoading
-          ? <Loader />
+          ? <Loader size={50} thickness={5} />
           : (
             <div className={classes.root}>
               {/* TODO: combine header and drawer components */}

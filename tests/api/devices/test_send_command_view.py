@@ -5,8 +5,6 @@ endpoint = 'devices.send_command_view'
 
 @pytest.mark.parametrize("command,device_ids", [
     ('info', [1],),
-    # ('restart_device', [1, 2, 3],),
-    # ('logs', [1, 2, 3, 4],),
 ])
 def test_default(client, app, command, device_ids):
     redis_key = 'test'

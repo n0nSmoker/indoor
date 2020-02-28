@@ -37,7 +37,7 @@ function* deleteUsersWorker(action) {
   }
 }
 
-function* mutateUsersWorker({ payload: { id, ...formData }, callback}) {
+function* mutateUsersWorker({ payload: { id, ...formData }, callback }) {
   try {
     if (id) {
       yield call(requests.put,`/users/${id}/`, formData)

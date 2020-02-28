@@ -9,12 +9,15 @@ import Table from '../../components/ResponsiveTable';
 import { setHeader as setHeaderAction } from '../../components/Header/actions';
 
 import {
-  fetchUsers as fetchUsersAction,
+  fetchDevices as fetchDevicesAction,
   setFilters as setFiltersAction,
-  deleteUser as deleteUserAction,
-  mutateUsers as mutateUsersAction,
+  fetchLocations as fetchLocationsAction,
+  mutateDevices as mutateDevicesAction,
+  mutateLocations as mutateLocationsAction,
 } from './actions';
-import { getRoleTitle, getStatusTitle, rolesOptions, statusOptions } from './helpers';
+
+import { getStatusTitle, statusOptions } from './helpers';
+
 import Form from './components/Form';
 
 
@@ -33,18 +36,19 @@ const styles = theme => ({
 });
 
 
-class Users extends React.Component {
+class Devices extends React.Component {
   state = {
     form: {
       open: false,
       data: null,
+      cityId: null,
     },
   };
   columns = [
     {
-      key: 'name',
-      title: 'Имя',
-      sorting: 'name',
+      key: 'id',
+      title: 'ID',
+      sorting: 'id',
     },
     {
       key: 'status',
@@ -53,15 +57,29 @@ class Users extends React.Component {
       getValue: item => getStatusTitle(item.status),
     },
     {
-      key: 'email',
-      title: 'E-mail',
-      sorting: 'email',
+      key: 'location',
+      title: 'Расположение',
+      getValue: item => item.location ? (
+        <div>
+          <div>Город: {item.location.city.name}</div>
+          <div>Адрес: {item.location.address}</div>
+        </div>
+      ) : 'Не указан'
     },
     {
-      key: 'role',
-      title: 'Роль',
-      sorting: 'role',
-      getValue: item => getRoleTitle(item.role),
+      key: 'contact',
+      title: 'Контакт',
+      getValue: item => item.contact ? (
+        <div>
+          <div>Имя: {item.contact.name}</div>
+          <div>Телефон: {item.contact.tel}</div>
+        </div>
+      ) : 'Не указан',
+    },
+    {
+      key: 'comment',
+      title: 'Комментарий',
+      sorting: 'comment',
     },
   ];
   actions = [
@@ -71,12 +89,6 @@ class Users extends React.Component {
       onClick: item => this.showForm(item),
       color: 'primary',
     },
-    {
-      key: 'delete',
-      title: 'Удалить',
-      onClick: item => this.deleteUser(item),
-      color: 'secondary',
-    },
   ];
   filterControls = [
     {
@@ -84,31 +96,22 @@ class Users extends React.Component {
       label: 'Статус',
       options: statusOptions,
     },
-    {
-      key: 'role',
-      label: 'Роль',
-      options: rolesOptions,
-    },
   ];
 
   componentDidMount() {
-    const { fetchUsers, setHeader } = this.props;
+    const { fetchDevices, setHeader } = this.props;
     setHeader({
-      title: 'Пользователи',
-      addBtn: {
-        onClick: this.showForm,
-        text: 'Добавить пользователя'
-      },
+      title: 'Устройства',
       search: {
-        placeholder: 'Поиск по пользователям',
+        placeholder: 'Поиск по устройствам',
         onSearch: (value) => {
           if (!value || 2 < value.length) {
-            fetchUsers();
+            fetchDevices();
           }
         },
       },
     });
-    fetchUsers();
+    fetchDevices();
   }
 
   componentWillUnmount() {
@@ -117,9 +120,9 @@ class Users extends React.Component {
   }
 
   handleFiltersChange = (filters) => {
-    const { setFilters, fetchUsers } = this.props;
+    const { setFilters, fetchDevices } = this.props;
     setFilters(filters);
-    fetchUsers();
+    fetchDevices();
   };
 
   setPage = (page) => {
@@ -143,41 +146,64 @@ class Users extends React.Component {
   };
 
   showForm = (data=null) => {
+    const { fetchLocations } = this.props;
+    const { location } = data;
+    if (location) {
+      const { city: { id } } = location;
+      fetchLocations(id);
+      this.setState(({ form, ...rest }) => ({
+        ...rest, form: { open: true, data, cityId: id }
+      }));
+    } else {
+      this.setState(({ form, ...rest }) => ({
+        ...rest, form: { open: true, data, cityId: null }
+      }));
+    }
+  };
+
+  handleChangeCity = ({ target }) => {
+    const { fetchLocations } = this.props;
+    // TODO: strange behavior of target.value expect number, but receive string
     this.setState(({ form, ...rest }) => ({
-      ...rest, form: { open: true, data }
-    }))
+      ...rest, form: { ...form, cityId: parseInt(target.value, 10) || null }
+    }));
+    fetchLocations(target.value);
   };
 
   hideForm = () => {
     this.setState(({ form, ...rest }) => ({
-      ...rest, form: { open: false, data: null }
+      ...rest, form: { open: false, data: null, cityId: null }
     }))
   };
 
+  // TODO: move to saga
   handleFormSubmit = (formData) => {
     const { form: { data } } = this.state;
-    const { mutateUsers } = this.props;
-    mutateUsers({...formData, id: data.id}, this.hideForm);
+    const { mutateDevices } = this.props;
+    mutateDevices({ ...formData, id: data.id }, this.hideForm);
   };
 
-  deleteUser = (user) => {
-    const { deleteUser } = this.props;
-    // TODO: make confirm dialog
-    if (confirm(`Удалить пользователя ${user.name}?`)) {
-      deleteUser(user.id);
-    }
+  handleLocationSubmit = (formData, callback) => {
+    const { form: { cityId }} = this.state;
+    const { mutateLocations } = this.props;
+    mutateLocations({ ...formData, city_id: cityId }, callback)
   };
 
   render() {
     const { form } = this.state;
-    const { classes, users, filters, total } = this.props;
+    const { classes, devices, filters, total, cities, locations } = this.props;
     return (
       <>
         {form.open &&
           <Form
             data={form.data}
+            citiesData={cities}
+            cityId={form.cityId}
+            locationsData={locations}
             handleClose={this.hideForm}
             handleSubmit={this.handleFormSubmit}
+            handleChangeCity={this.handleChangeCity}
+            handleLocationSubmit={this.handleLocationSubmit}
           />}
         <div className={classes.filters}>
           {this.filterControls.map(control => (
@@ -204,7 +230,7 @@ class Users extends React.Component {
           ))}
         </div>
         <Table
-          items={users}
+          items={devices}
           columns={this.columns}
           actions={this.actions}
           sorting={filters.sort_by}
@@ -220,26 +246,30 @@ class Users extends React.Component {
   }
 }
 
-Users.propTypes = {
-  users: PropTypes.array.isRequired,
+Devices.propTypes = {
+  devices: PropTypes.array.isRequired,
+  locations: PropTypes.array,
+  cities: PropTypes.array,
   isLoading: PropTypes.bool.isRequired,
   filters: PropTypes.object.isRequired,
   total: PropTypes.number.isRequired,
-  fetchUsers: PropTypes.func.isRequired,
+  fetchDevices: PropTypes.func.isRequired,
+  mutateDevices: PropTypes.func.isRequired,
+  fetchLocations: PropTypes.func.isRequired,
+  mutateLocations: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
-  deleteUser: PropTypes.func.isRequired,
-  mutateUsers: PropTypes.func.isRequired,
   setHeader: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ usersReducer }) => ({ ...usersReducer });
+const mapStateToProps = ({ devicesReducer }) => ({ ...devicesReducer });
 
 const mapDispatchToProps = {
-  fetchUsers: fetchUsersAction,
+  fetchDevices: fetchDevicesAction,
+  mutateDevices: mutateDevicesAction,
   setFilters: setFiltersAction,
-  deleteUser: deleteUserAction,
-  mutateUsers: mutateUsersAction,
   setHeader: setHeaderAction,
+  fetchLocations: fetchLocationsAction,
+  mutateLocations: mutateLocationsAction,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Users));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Devices));

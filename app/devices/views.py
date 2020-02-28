@@ -1,11 +1,9 @@
 from flask import Blueprint
 from sqlalchemy import or_
-import logging
 
-from app.locations.models import Location
+from app.locations.models import Location, City
 from app.common.decorators import admin_required, auth_required
 
-from . import constants as DEVICE
 from lib.factory import db
 from lib.utils import success, fail
 from lib.webargs import parser
@@ -26,7 +24,7 @@ mod = Blueprint('devices', __name__, url_prefix='/devices')
 @mod.route('/')
 @auth_required
 @parser.use_kwargs(FilterDevicesSchema())
-def devices_list_view(page, limit, sort_by, query):
+def devices_list_view(page, limit, sort_by, query, status):
     """Get list of devices.
     ---
     get:
@@ -53,13 +51,17 @@ def devices_list_view(page, limit, sort_by, query):
     """
     q = Device.query
 
+    if status:
+        q = q.filter_by(status=status)
+
     if query:
         q = q.filter(
             or_(
                 Device.comment.ilike(f'%{query}%'),
                 Device.location.has(Location.address.ilike(f'%{query}%')),
                 Device.contact.has(Contact.name.ilike(f'%{query}%')),
-                Device.contact.has(Contact.tel.ilike(f'%{query}%'))
+                Device.contact.has(Contact.tel.ilike(f'%{query}%')),
+                Device.location.has(Location.city.has(City.name.ilike(f'%{query}%')))
             )
         )
 
@@ -314,4 +316,3 @@ def send_command_view(**kwargs):
     data = save_command(command, device_ids, redis_key)
 
     return data
-

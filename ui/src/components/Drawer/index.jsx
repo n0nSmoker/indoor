@@ -11,11 +11,12 @@ import ListItemText from '@material-ui/core/ListItemText';
 import GroupIcon from '@material-ui/icons/Group';
 import MovieIcon from '@material-ui/icons/Movie';
 import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
+import TvIcon from '@material-ui/icons/Tv';
 
 import useStyles from './styles';
 
 
-export default function AppDrawer({ mobileOpen, handleDrawerToggle }) {
+export default function AppDrawer({ mobileOpen, handleDrawerToggle, currentUser }) {
   const classes = useStyles();
   let props = {
     classes: {
@@ -31,28 +32,31 @@ export default function AppDrawer({ mobileOpen, handleDrawerToggle }) {
         </Typography>
         <Divider className={classes.divider} />
         <List>
-          <NavLink
-            to="/users/"
-            className={classes.navLink}
-          >
-            <ListItem button>
-              <ListItemIcon>
-                <GroupIcon className={classes.listIcon} />
-              </ListItemIcon>
-              <ListItemText primary="Пользователи" />
-            </ListItem>
-          </NavLink>
-          <NavLink
-            to="/publishers/"
-            className={classes.navLink}
-          >
-            <ListItem button>
-              <ListItemIcon>
-                <MovieIcon className={classes.listIcon} />
-              </ListItemIcon>
-              <ListItemText primary="Рекламодатели" />
-            </ListItem>
-          </NavLink>
+          {currentUser.is_admin &&
+            <>
+              <NavLink
+                to="/users/"
+                className={classes.navLink}
+              >
+                <ListItem button>
+                  <ListItemIcon>
+                    <GroupIcon className={classes.listIcon} />
+                  </ListItemIcon>
+                  <ListItemText primary="Пользователи" />
+                </ListItem>
+              </NavLink>
+              <NavLink
+                to="/publishers/"
+                className={classes.navLink}
+              >
+                <ListItem button>
+                  <ListItemIcon>
+                    <MovieIcon className={classes.listIcon} />
+                  </ListItemIcon>
+                  <ListItemText primary="Рекламодатели" />
+                </ListItem>
+              </NavLink>
+            </>}
           <NavLink
             to="/content/"
             className={classes.navLink}
@@ -62,6 +66,17 @@ export default function AppDrawer({ mobileOpen, handleDrawerToggle }) {
                 <VideoLibraryIcon className={classes.listIcon} />
               </ListItemIcon>
               <ListItemText primary="Контент" />
+            </ListItem>
+          </NavLink>
+          <NavLink
+            to="/devices/"
+            className={classes.navLink}
+          >
+            <ListItem button>
+              <ListItemIcon>
+                <TvIcon className={classes.listIcon} />
+              </ListItemIcon>
+              <ListItemText primary="Устройства" />
             </ListItem>
           </NavLink>
         </List>

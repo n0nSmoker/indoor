@@ -56,7 +56,7 @@ def test_search_mode(client, add_user):
     # Add some noise
     for s in strings:
         # We do not search by city_name
-        location = add_location(city_name=s)
+        location = add_location(city_name=get_random_str())
         add_device(location_id=location.id)
 
         location = add_location(address=get_random_str())

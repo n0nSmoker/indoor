@@ -1,5 +1,4 @@
 from flask import current_app as app
-
 from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError

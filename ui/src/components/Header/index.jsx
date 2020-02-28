@@ -18,7 +18,7 @@ import { setSearchValue as setSearchValueAction } from './actions';
 import useStyles from './styles';
 
 
-function Header({ title, search, addBtn, setSearchValue, handleDrawerToggle }) {
+function Header({ title, search, addBtn, setSearchValue, handleDrawerToggle, currentUser }) {
   const classes = useStyles();
   const handleSearch = ({ target: { value } }) => {
     setSearchValue(value);
@@ -81,6 +81,7 @@ function Header({ title, search, addBtn, setSearchValue, handleDrawerToggle }) {
               ),
             }}
           />}
+        {currentUser.name}
         <Button
           color="primary"
           onClick={

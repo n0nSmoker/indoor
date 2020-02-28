@@ -1,3 +1,4 @@
+
 class Cache:
     """
     Abstract cache class

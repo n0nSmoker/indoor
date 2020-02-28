@@ -29,18 +29,22 @@ class Publishers extends React.Component {
     {
       key: 'name',
       title: 'Имя',
+      sorting: 'name',
     },
     {
       key: 'airtime',
       title: 'Эфирное время',
+      sorting: 'airtime',
     },
     {
       key: 'comment',
       title: 'Комментарий',
+      sorting: 'comment',
     },
     {
       key: 'created_at',
       title: 'Дата создания',
+      sorting: 'created_at',
       getValue: item => convertDate(item.created_at),
     },
   ];
@@ -100,6 +104,11 @@ class Publishers extends React.Component {
     this.handleFiltersChange({ ...filters, limit, page: 1 })
   };
 
+  setSorting = sortBy => {
+    const { filters } = this.props;
+    this.handleFiltersChange({ ...filters, sort_by: sortBy })
+  };
+
   showForm = (data=null) => {
     this.setState(({ form, ...rest }) => ({
       ...rest, form: { open: true, data }
@@ -141,6 +150,8 @@ class Publishers extends React.Component {
           items={publishers}
           columns={this.columns}
           actions={this.actions}
+          sorting={filters.sort_by}
+          onSortingChange={this.setSorting}
           page={filters.page}
           onPageChange={this.setPage}
           limit={filters.limit}

@@ -2,14 +2,13 @@ from webargs import fields, validate
 from webargs.fields import ma
 from marshmallow_sqlalchemy import ModelSchema
 
-from app.common.schemas import FilterSchema, SuccessListSchema
+from app.common.schemas import FilterSchema, SuccessListSchema, sort_one_of
 from app.publishers.models import Publisher
 
 
 class FilterPublishersSchema(FilterSchema):
     sort_by = fields.Str(
-        validate=validate.OneOf(
-            ['id', 'name', 'created_at', 'updated_at']),
+        validate=sort_one_of(['id', 'name', 'airtime', 'comment', 'created_at', 'updated_at']),
         missing='created_at'
     )
     query = fields.Str(validate=validate.Length(min=3, max=100), missing=None)

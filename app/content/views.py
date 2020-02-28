@@ -1,7 +1,6 @@
 from flask import Blueprint
 from sqlalchemy import or_
 
-from app.users.constants import ROLE_ADMIN
 from app.common.decorators import auth_required
 from app.common.utils import delete_file
 from lib.auth.manager import current_user
@@ -52,6 +51,9 @@ def files_list_view(page, limit, sort_by, query):
           description: Unexpected error
     """
     q = File.query
+
+    if not current_user.is_admin:
+        q = q.filter_by(publisher_id=current_user.publisher_id)
 
     if query:
         q = q.filter(
@@ -123,12 +125,13 @@ def delete_file_view(file_id):
           description: Unexpected error
     """
     file = File.query.get_or_404(file_id)
-    if file.created_by != current_user.id and current_user.role != ROLE_ADMIN:
+    if file.created_by != current_user.id and not current_user.is_admin:
         return fail('You can not delete this item', 403)
+    response = FileSchema().dump(file)
     db.session.delete(file)
     db.session.commit()
     delete_file(file.src)
-    return success(FileSchema().dump(file))
+    return success(response)
 
 
 @mod.route('/<int:file_id>/', methods=['PUT'])
@@ -163,7 +166,7 @@ def update_file_view(file_id, **kwargs):
           description: Unexpected error
     """
     file = File.query.get_or_404(file_id)
-    if file.created_by != current_user.id and current_user.role != ROLE_ADMIN:
+    if file.created_by != current_user.id and not current_user.is_admin:
         return fail('You can not edit this item', 403)
     file = save_content(instance=file, **kwargs)
     return success(FileSchema().dump(file))

@@ -72,6 +72,38 @@ def locations_list_view(page, limit, sort_by, query):
     )))
 
 
+@mod.route('/<int:city_id>/')
+@auth_required
+def locations_by_city_id_view(city_id):
+    """Get list of locations by city_id
+    ---
+    get:
+      tags:
+        - Locations
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          content:
+            application/json:
+              schema: LocationListSchema
+        403:
+          description: Forbidden
+        400:
+          content:
+            application/json:
+              schema: FailSchema
+        5XX:
+          description: Unexpected error
+    """
+    q = Location.query
+    q = q.filter(Location.city.has(City.id == city_id))
+
+    return success(LocationListSchema().dump(dict(
+        results=q
+    )))
+
+
 @mod.route('/', methods=['POST'])
 @admin_required
 @parser.use_kwargs(AddLocationSchema())

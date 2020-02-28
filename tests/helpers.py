@@ -50,9 +50,11 @@ def add_device_health(device_id, software_version=None, created_at=None):
     )
 
 
-def add_content(created_by, comment=None):
+def add_content(created_by, publisher_id, comment=None, status=None):
     return save_content(
         file=FileStorage(open('tests/data/FaceImage.jpg', 'rb')),
         comment=comment or get_random_str(),
-        created_by=created_by
+        created_by=created_by,
+        publisher_id=publisher_id,
+        status=status,
     )

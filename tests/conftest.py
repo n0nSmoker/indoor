@@ -2,7 +2,7 @@ import pytest
 
 from app.devices.utils import get_device_by_token
 from app.users.utils import get_user_by_id, save_user
-from app.users.constants import ROLE_USER
+from app.users.constants import ROLE_MANAGER, ROLE_USER
 
 from app.publishers.utils import save_publisher
 
@@ -12,6 +12,7 @@ from lib.auth.manager import AuthManager
 from lib.factory import create_app, create_db, create_tables, drop_db, init_app
 from lib.utils import get_random_str
 
+from .helpers import add_publisher
 from .utils import Client, truncate_all_tables
 
 APP_NAME = 'indoor'
@@ -75,16 +76,18 @@ def client(app):  #noqa
 
 @pytest.fixture(scope='function')
 def add_user(client):
-    def func(name=None, email=None, password=None, role=ROLE_USER, log_him_in=False, **kwargs):
+    def func(name=None, email=None, password=None, role=ROLE_USER, publisher_id=None, log_him_in=False, **kwargs):
         name = name or f'User_{get_random_str()}'
         email = email or f'{get_random_str()}@email.com'
         password = password or get_random_str()
+        publisher_id = publisher_id or add_publisher().id if role == ROLE_MANAGER else None
 
         user = save_user(
             name=name,
             email=email,
             password=password,
             role=role,
+            publisher_id=publisher_id,
             **kwargs
         )
 

@@ -286,7 +286,7 @@ def add_contact_view(**kwargs):
 
 @mod.route('/commands/', methods=['POST'])
 @parser.use_kwargs(SendCommandSchema())
-def send_command_view(command, device_ids, redis_key):
+def send_command_view(**kwargs):
     """Post command on devices.
     ---
     post:
@@ -308,7 +308,10 @@ def send_command_view(command, device_ids, redis_key):
         5XX:
           description: Unexpected error
     """
-
+    command = kwargs['command']
+    device_ids = kwargs['device_ids']
+    redis_key = kwargs['redis_key']
     data = save_command(command, device_ids, redis_key)
 
-    return success(SendCommandSchema().dump(data))
+    return data
+

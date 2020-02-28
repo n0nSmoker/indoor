@@ -64,11 +64,11 @@ def save_command(command, device_ids, redis_key):
     for i in device_ids:
         app.cache.storage.rpush(redis_key, command + str(i))
         ids.append(i)
-    data = dict(
+    resp = dict(
         command=command,
         device_ids=ids
     )
-    return data
+    return resp
 
 
 def check_token(token):

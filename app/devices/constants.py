@@ -12,12 +12,14 @@ STATUSES = (
 
 SHOW_INFO = 'info'
 RESTART = 'restart'
-RESTART_DEVICE = 'restart device'
+RESTART_DEVICE = 'restart_device'
 SEND_LOGS = 'logs'
 
-COMMAND = (
-    ('', SHOW_INFO),
-    ('', RESTART),
-    ('', RESTART_DEVICE),
-    ('', SEND_LOGS),
+COMMANDS_REDIS_KEY = 'temp'
+
+COMMANDS = (
+    ('Показать информацию', SHOW_INFO),
+    ('Перезагрузить программу', RESTART),
+    ('Перезапустить устройство', RESTART_DEVICE),
+    ('Отправить логи', SEND_LOGS),
 )

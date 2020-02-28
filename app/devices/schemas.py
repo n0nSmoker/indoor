@@ -71,8 +71,6 @@ class UpdateContactSchema(ma.Schema):
     comment = fields.Str(validate=Length(max=1024), missing=None)
 
 
-class CommandSchema(ma.Schema):
-    device_list = fields.Str(validate=Length(max=255), missing=None)
-    limit = fields.Int(missing=10, validate=validate.Range(min=1, max=1000))
-    command = fields.Str(validate=validate.OneOf(['show_info', 'restart',
-                                                  'restart_device', 'send_logs']), missing='show_info')
+class SendCommandSchema(ma.Schema):
+    command = fields.Str(validate=validate.OneOf([s[1] for s in DEVICE.COMMANDS]), missing=None)
+    device_ids = fields.DelimitedList(fields.Int())

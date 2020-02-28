@@ -67,18 +67,6 @@ class Cache:
             ttl=3600
         )
 
-    def set_command_log(self, log):
-        self._set(
-            key='command_log',
-            value=log,
-            ttl=600
-        )
-
-    def get_command_log(self):
-        self._get(
-            key='command_log'
-        )
-
     def invalidate_auth_token(self, token):
         """
         Removes token and user data from the storage

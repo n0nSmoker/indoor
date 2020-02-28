@@ -1,9 +1,11 @@
 from flask import Blueprint
 from sqlalchemy import or_
+import logging
 
 from app.locations.models import Location
 from app.common.decorators import admin_required, auth_required
 
+from . import constants as DEVICE
 from lib.factory import db
 from lib.utils import success, fail
 from lib.webargs import parser
@@ -15,7 +17,7 @@ from .schemas import (
     DeviceSchema,
     DeviceListSchema,
     RegisterDeviceSchema,
-    RegisteredDeviceSchema, ContactSchema, AddContactSchema, UpdateContactSchema, CommandSchema)
+    RegisteredDeviceSchema, ContactSchema, AddContactSchema, UpdateContactSchema, SendCommandSchema)
 from .utils import save_device, save_contact, save_command
 
 mod = Blueprint('devices', __name__, url_prefix='/devices')
@@ -282,35 +284,31 @@ def add_contact_view(**kwargs):
     return success(ContactSchema().dump(contact))
 
 
-@mod.route('/')
-@auth_required
-@parser.use_kwargs(CommandSchema())
-def command_for_devices_view(devices_list, command):
-    """Get list of devices.
-        ---
-        get:
-          tags:
-            - Commands
-          security:
-            - cookieAuth: []
-          parameters:
-          - in: query
-            schema: CommandSchema
-          responses:
-            200:
-              content:
-                application/json:
-                  schema: CommandSchema
-            403:
-              description: Forbidden
-            400:
-              content:
-                application/json:
-                  schema: FailSchema
-            5XX:
-              description: Unexpected error
-        """
-    device_list = devices_list.split(',')
-    device_list = [i for i in device_list if Device.query.get_or_404(i)]
+@mod.route('/commands/', methods=['POST'])
+@parser.use_kwargs(SendCommandSchema())
+def send_command_view(command, device_ids, redis_key):
+    """Post command on devices.
+    ---
+    post:
+      tags:
+        - Commands
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema: SendCommandSchema
+      responses:
+        200:
+          content:
+            application/json:
+              schema: SendCommandSchema
+        400:
+          content:
+            application/json:
+              schema: FailSchema
+        5XX:
+          description: Unexpected error
+    """
 
-    return save_command(device_list, command)
+    data = save_command(command, device_ids, redis_key)
+
+    return success(SendCommandSchema().dump(data))

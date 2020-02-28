@@ -16,7 +16,7 @@ import TvIcon from '@material-ui/icons/Tv';
 import useStyles from './styles';
 
 
-export default function AppDrawer({ mobileOpen, handleDrawerToggle }) {
+export default function AppDrawer({ mobileOpen, handleDrawerToggle, currentUser }) {
   const classes = useStyles();
   let props = {
     classes: {
@@ -32,28 +32,31 @@ export default function AppDrawer({ mobileOpen, handleDrawerToggle }) {
         </Typography>
         <Divider className={classes.divider} />
         <List>
-          <NavLink
-            to="/users/"
-            className={classes.navLink}
-          >
-            <ListItem button>
-              <ListItemIcon>
-                <GroupIcon className={classes.listIcon} />
-              </ListItemIcon>
-              <ListItemText primary="Пользователи" />
-            </ListItem>
-          </NavLink>
-          <NavLink
-            to="/publishers/"
-            className={classes.navLink}
-          >
-            <ListItem button>
-              <ListItemIcon>
-                <MovieIcon className={classes.listIcon} />
-              </ListItemIcon>
-              <ListItemText primary="Рекламодатели" />
-            </ListItem>
-          </NavLink>
+          {currentUser.is_admin &&
+            <>
+              <NavLink
+                to="/users/"
+                className={classes.navLink}
+              >
+                <ListItem button>
+                  <ListItemIcon>
+                    <GroupIcon className={classes.listIcon} />
+                  </ListItemIcon>
+                  <ListItemText primary="Пользователи" />
+                </ListItem>
+              </NavLink>
+              <NavLink
+                to="/publishers/"
+                className={classes.navLink}
+              >
+                <ListItem button>
+                  <ListItemIcon>
+                    <MovieIcon className={classes.listIcon} />
+                  </ListItemIcon>
+                  <ListItemText primary="Рекламодатели" />
+                </ListItem>
+              </NavLink>
+            </>}
           <NavLink
             to="/content/"
             className={classes.navLink}

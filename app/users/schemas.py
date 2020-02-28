@@ -22,6 +22,8 @@ class FilterUsersSchema(FilterSchema):
 
 
 class UserSchema(ModelSchema):
+    is_admin = fields.Bool()
+
     class Meta:
         model = User
         exclude = ['password']

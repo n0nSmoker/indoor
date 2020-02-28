@@ -13,7 +13,7 @@ def root_view(path=None):
         return redirect('/login/')
     # TODO: make it on front  # noqa
     if not path:
-        return redirect('/admin/users/')
+        return redirect('/admin/content/')
     return render_template('index.html')
 
 

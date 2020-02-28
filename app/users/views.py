@@ -1,6 +1,7 @@
 from flask import Blueprint, current_app as app, request
 from sqlalchemy import or_
 
+from lib.auth.manager import current_user
 from lib.factory import db
 from lib.utils import success, fail
 from lib.webargs import parser
@@ -197,6 +198,29 @@ def delete_user_view(user_id):
     db.session.delete(user)
     db.session.commit()
     return success(UserSchema().dump(user))
+
+
+@mod.route('/current/')
+@auth_required
+def current_user_view():
+    """Current user.
+    ---
+    get:
+      tags:
+        - Users
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          content:
+            application/json:
+              schema: UserSchema
+        403:
+          description: Forbidden
+        5XX:
+          description: Unexpected error
+    """
+    return success(UserSchema().dump(current_user))
 
 
 @mod.route('/login/', methods=['POST'])

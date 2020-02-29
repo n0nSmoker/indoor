@@ -307,7 +307,7 @@ def send_command_view(command, device_ids):
                 additionalProperties:
                   type: string
                 example:
-                  comands/id1: info
+                  commands/id1: info
         400:
           content:
             application/json:
@@ -315,6 +315,11 @@ def send_command_view(command, device_ids):
         5XX:
           description: Unexpected error
     """
-    data = save_command(command, device_ids)
+    if str('') in device_ids:
+        resp = fail('Field:device_ids. Enter the correct values.')
 
-    return success(data)
+    else:
+        data = save_command(command, device_ids)
+        resp = success(data)
+
+    return resp

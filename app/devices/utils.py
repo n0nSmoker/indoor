@@ -62,8 +62,8 @@ def save_command(command, device_ids):
     """
     ids = []
     for i in device_ids:
-        app.cache.storage.rpush(DEVICE.REDIS_KEY + '/' + str(i), command)
-        ids.append(DEVICE.REDIS_KEY + '/' + str(i))
+        app.cache.storage.rpush(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + str(i), command)
+        ids.append(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + str(i))
     resp = dict.fromkeys(ids, command)
 
     return resp

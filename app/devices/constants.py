@@ -11,6 +11,7 @@ STATUSES = (
 )
 
 REDIS_KEY = 'commands'
+REDIS_KEY_DELIMITER = '/'
 
 SHOW_INFO = 'info'
 RESTART = 'restart'

@@ -7,6 +7,7 @@ from lib.factory import db
 from lib.utils import setattrs
 
 from .models import Device, Contact, ContactException
+from . import constants as DEVICE
 
 
 def save_device(instance=None, **kwargs):
@@ -59,15 +60,12 @@ def save_command(command, device_ids):
     """
     Save log on redis_cache
     """
-    redis_key = 'commands'
     ids = []
     for i in device_ids:
-        app.cache.storage.rpush(redis_key, command + '/' + str(i))
-        ids.append(i)
-    resp = dict(
-        command=command,
-        device_ids=ids
-    )
+        app.cache.storage.rpush(DEVICE.REDIS_KEY + '/' + str(i), command)
+        ids.append(DEVICE.REDIS_KEY + '/' + str(i))
+    resp = dict.fromkeys(ids, command)
+
     return resp
 
 

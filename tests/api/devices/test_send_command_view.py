@@ -1,10 +1,16 @@
 import pytest
 
+from app.devices import constants as DEVICE
+from lib.utils import get_random_str
+
 endpoint = 'devices.send_command_view'
 
 
 @pytest.mark.parametrize("command,device_ids", [
-    ('info', [1],),
+    ('info', ['1'],),
+    ('restart', ['1', '2'],),
+    ('restart_device', ['1', get_random_str()],),
+    ('restart_device', [get_random_str()],),
 ])
 def test_default(client, app, command, device_ids):
     resp = client.post(
@@ -14,17 +20,14 @@ def test_default(client, app, command, device_ids):
             device_ids=device_ids,
         ),
     )
-    assert 'command' in resp
-    assert 'device_ids' in resp
-    assert resp['command'] == command
-    assert resp['device_ids'] == device_ids
-    assert b'info1' in app.cache.storage.lrange('commands', start=0, end=-1)
-    app.cache.storage.rpop('commands')
+    assert DEVICE.REDIS_KEY + '/' + device_ids[0] in resp
 
 
 @pytest.mark.parametrize("command,device_ids", [
-    ('test', [1],),
-    ('', [1],),
+    ('test', ['1'],),
+    ('', ['1'],),
+    (None, ['1'],),
+    (get_random_str(), ['1'],),
 ])
 def test_malformed_params_failure(client, app, command, device_ids):
     resp = client.post(

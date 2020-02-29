@@ -302,7 +302,12 @@ def send_command_view(command, device_ids):
         200:
           content:
             application/json:
-              schema: SendCommandSchema
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                example:
+                  comands/id1: info
         400:
           content:
             application/json:
@@ -312,4 +317,4 @@ def send_command_view(command, device_ids):
     """
     data = save_command(command, device_ids)
 
-    return success(SendCommandSchema().dump(data))
+    return success(data)

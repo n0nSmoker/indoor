@@ -73,4 +73,4 @@ class UpdateContactSchema(ma.Schema):
 
 class SendCommandSchema(ma.Schema):
     command = fields.Str(validate=validate.OneOf([s[1] for s in DEVICE.COMMANDS]), missing=DEVICE.SHOW_INFO)
-    device_ids = fields.DelimitedList(fields.Int())
+    device_ids = fields.DelimitedList(fields.Str())

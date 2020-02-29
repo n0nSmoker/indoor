@@ -10,6 +10,8 @@ STATUSES = (
     ('Не актиивна', INACTIVE),
 )
 
+REDIS_KEY = 'commands'
+
 SHOW_INFO = 'info'
 RESTART = 'restart'
 RESTART_DEVICE = 'restart_device'

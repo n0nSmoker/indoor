@@ -7,21 +7,19 @@ endpoint = 'devices.send_command_view'
     ('info', [1],),
 ])
 def test_default(client, app, command, device_ids):
-    redis_key = 'test'
     resp = client.post(
         endpoint=endpoint,
         data=dict(
             command=command,
             device_ids=device_ids,
-            redis_key=redis_key,
         ),
     )
     assert 'command' in resp
     assert 'device_ids' in resp
     assert resp['command'] == command
     assert resp['device_ids'] == device_ids
-    assert b'info1' in app.cache.storage.lrange(redis_key, start=0, end=-1)
-    app.cache.storage.rpop(redis_key)
+    assert b'info1' in app.cache.storage.lrange('commands', start=0, end=-1)
+    app.cache.storage.rpop('commands')
 
 
 @pytest.mark.parametrize("command,device_ids", [

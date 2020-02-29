@@ -55,13 +55,14 @@ def save_contact(instance=None, **kwargs):
     return instance
 
 
-def save_command(command, device_ids, redis_key):
+def save_command(command, device_ids):
     """
     Save log on redis_cache
     """
+    redis_key = 'commands'
     ids = []
     for i in device_ids:
-        app.cache.storage.rpush(redis_key, command + str(i))
+        app.cache.storage.rpush(redis_key, command + '/' + str(i))
         ids.append(i)
     resp = dict(
         command=command,

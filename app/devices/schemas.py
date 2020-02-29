@@ -74,4 +74,3 @@ class UpdateContactSchema(ma.Schema):
 class SendCommandSchema(ma.Schema):
     command = fields.Str(validate=validate.OneOf([s[1] for s in DEVICE.COMMANDS]), missing=DEVICE.SHOW_INFO)
     device_ids = fields.DelimitedList(fields.Int())
-    redis_key = fields.Str(validate=Length(min=1, max=255), missing='commands')

@@ -15,8 +15,6 @@ RESTART = 'restart'
 RESTART_DEVICE = 'restart_device'
 SEND_LOGS = 'logs'
 
-COMMANDS_REDIS_KEY = 'commands'
-
 COMMANDS = (
     ('Показать информацию', SHOW_INFO),
     ('Перезагрузить программу', RESTART),

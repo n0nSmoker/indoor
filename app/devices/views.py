@@ -359,7 +359,7 @@ def commands_by_id_view(device_id):
 
 
 @mod.route('/commands/<device_id>/', methods=['DELETE'])
-def delete_commands_view(device_id):
+def delete_commands_by_id_view(device_id):
     """Delete command history by device_id.
     ---
     delete:

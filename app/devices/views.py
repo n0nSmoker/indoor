@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, current_app as app
 from sqlalchemy import or_
 
 from app.locations.models import Location, City
@@ -15,8 +15,9 @@ from .schemas import (
     DeviceSchema,
     DeviceListSchema,
     RegisterDeviceSchema,
-    RegisteredDeviceSchema, ContactSchema, AddContactSchema, UpdateContactSchema, SendCommandSchema)
+    RegisteredDeviceSchema, ContactSchema, AddContactSchema, UpdateContactSchema, SendCommandSchema,)
 from .utils import save_device, save_contact, save_command
+from . import constants as DEVICE
 
 mod = Blueprint('devices', __name__, url_prefix='/devices')
 
@@ -323,3 +324,73 @@ def send_command_view(command, device_ids):
         resp = success(data)
 
     return resp
+
+
+@mod.route('/commands/<device_id>/')
+def commands_by_id_view(device_id):
+    """Get command history by device_id.
+    ---
+    get:
+      tags:
+        - Commands
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                example:
+                  commands/id1: [
+                    "info"
+                  ]
+        400:
+          content:
+            application/json:
+              schema: FailSchema
+        5XX:
+          description: Unexpected error
+    """
+    commands = app.cache.storage.lrange(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + device_id, 0, -1)
+    resp = {DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + device_id: commands}
+
+    return success(resp)
+
+
+@mod.route('/commands/<device_id>/', methods=['DELETE'])
+def delete_commands_view(device_id):
+    """Delete command history by device_id.
+    ---
+    delete:
+      tags:
+        - Commands
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                example:
+                  commands/id1: {
+                    "info": 0,
+                    "restart": 0,
+                    "restart_device": 0,
+                    "logs": 0
+                  }
+        400:
+          content:
+            application/json:
+              schema: FailSchema
+        5XX:
+          description: Unexpected error
+    """
+    data = {}
+    for command in [s[1] for s in DEVICE.COMMANDS]:
+        num = app.cache.storage.lrem(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + device_id, 0, command)
+        data[command] = num
+    resp = {DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + device_id: data}
+
+    return success(resp)

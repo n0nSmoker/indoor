@@ -86,8 +86,8 @@ class ServerSelect extends React.Component {
     this.setState(() => ({
       value: option.label,
       selectedOption: option,
-      showOptions: false,
     }));
+    this.toggleShowOptions();
     onChange({
       target: {
         name,

@@ -9,7 +9,7 @@ endpoint = 'users.users_list_view'
 
 def test_default(client, add_user):
     u1 = add_user(role=ROLE_ADMIN, log_him_in=True)
-    u2 = add_user(role=ROLE_USER, log_him_in=False)
+    u2 = add_user(role=ROLE_MANAGER, log_him_in=False)
     resp = client.get(
         endpoint=endpoint
     )
@@ -18,8 +18,14 @@ def test_default(client, add_user):
     assert 'results' in resp
     assert len(resp['results']) == 2
     assert {u1.id, u2.id} == {r['id'] for r in resp['results']}
-    assert 'password' not in resp['results'][0]
-    assert 'password' not in resp['results'][1]
+    for user in resp['results']:
+        assert 'password' not in user
+        assert 'publisher' in user
+        if u2.id == user['id']:
+            assert user['publisher']
+            assert 'id' in user['publisher']
+            assert 'name' in user['publisher']
+            assert 2 == len(user['publisher'])
 
 
 def test_search_mode(client, add_user):

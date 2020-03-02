@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 
-import FormDialog from '../../../../components/FormDialog';
-
-import { rolesOptions } from '../../helpers';
+import FormDialog from 'components/FormDialog';
+import ServerSelect from 'components/ServerSelect';
+import { USERS_ROLE_ADMIN, USERS_ROLE_MANAGER } from 'pages/Users/consts';
+import { rolesOptions } from 'pages/Users/helpers';
 
 
 const useStyles = makeStyles(theme => ({
@@ -25,15 +26,19 @@ export default function Form({ data, handleClose, handleSubmit }) {
       name: data.name,
       email: data.email,
       role: data.role,
+      publisher_id: data.publisher.id,
     }
-    : {};
+    : {
+      role: USERS_ROLE_MANAGER,
+    };
   const [formData, setFormData] = React.useState(initialFormData);
 
-  const handleChange = ({ target }) => {
-    setFormData({
-      ...formData,
-      [target.name]: target.value
-    });
+  const handleChange = ({ target: { name, value }}) => {
+    const newFormData = {...formData, [name]: value};
+    if (name === 'role' && value === USERS_ROLE_ADMIN) {
+      delete newFormData.publisher_id;
+    }
+    setFormData(newFormData);
   };
 
   const isValid = () => {
@@ -72,6 +77,7 @@ export default function Form({ data, handleClose, handleSubmit }) {
           margin="dense"
         />
         <TextField
+          autoComplete="off"
           fullWidth
           name="password"
           label="Пароль"
@@ -100,6 +106,16 @@ export default function Form({ data, handleClose, handleSubmit }) {
             </option>
           ))}
         </TextField>
+        {formData.role !== USERS_ROLE_ADMIN &&
+          <ServerSelect
+            name="publisher_id"
+            initialValue={isEdit ? data.publisher : null}
+            onChange={handleChange}
+            path='publishers'
+            valueKey='id'
+            labelKey='name'
+            label='Рекламодатель'
+          />}
       </form>
     </FormDialog>
   );

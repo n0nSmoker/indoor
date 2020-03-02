@@ -58,6 +58,12 @@ class Users extends React.Component {
       sorting: 'email',
     },
     {
+      key: 'publisher',
+      title: 'Рекламодатель',
+      sorting: 'publisher_id',
+      getValue: item => item.publisher ? item.publisher.name : '-',
+    },
+    {
       key: 'role',
       title: 'Роль',
       sorting: 'role',

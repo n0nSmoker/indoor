@@ -42,7 +42,6 @@ export function getStatusTitle(name) {
 }
 
 export const rolesOptions = [
-  { value: USERS_ROLE_USER, label: USERS_ROLE_USER_TITLE },
   { value: USERS_ROLE_MANAGER, label: USERS_ROLE_MANAGER_TITLE },
   { value: USERS_ROLE_ADMIN, label: USERS_ROLE_ADMIN_TITLE },
 ];

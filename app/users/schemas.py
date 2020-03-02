@@ -5,6 +5,7 @@ from marshmallow import validates_schema
 from marshmallow.validate import Length
 
 from app.common.schemas import FilterSchema, SuccessListSchema, sort_one_of
+from app.publishers.schemas import PublisherSchema
 from app.users.constants import ROLES, ROLE_ADMIN, ROLE_MANAGER, ROLE_USER, STATUSES
 from app.users.models import User
 
@@ -12,7 +13,8 @@ from app.users.models import User
 class FilterUsersSchema(FilterSchema):
     sort_by = fields.Str(
         validate=sort_one_of([
-            'id', 'name', 'email', 'role', 'status', 'created_at', 'updated_at',
+            'id', 'name', 'email', 'role', 'status',
+            'publisher_id', 'created_at', 'updated_at',
         ]),
         missing='-created_at'
     )
@@ -23,6 +25,10 @@ class FilterUsersSchema(FilterSchema):
 
 class UserSchema(ModelSchema):
     is_admin = fields.Bool()
+    publisher = fields.Nested(
+        lambda: PublisherSchema(only=('id', 'name')),
+        many=False,
+    )
 
     class Meta:
         model = User

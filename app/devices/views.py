@@ -16,7 +16,7 @@ from .schemas import (
     DeviceListSchema,
     RegisterDeviceSchema,
     RegisteredDeviceSchema, ContactSchema, AddContactSchema, UpdateContactSchema, SendCommandSchema,)
-from .utils import save_device, save_contact, save_command
+from .utils import save_device, save_contact, save_command, get_command_log_by_id
 from . import constants as DEVICE
 
 mod = Blueprint('devices', __name__, url_prefix='/devices')
@@ -316,19 +316,13 @@ def send_command_view(command, device_ids):
         5XX:
           description: Unexpected error
     """
-    if str('') in device_ids:
-        resp = fail('Field:device_ids. Enter the correct values.')
-
-    else:
-        data = save_command(command, device_ids)
-        resp = success(data)
-
-    return resp
+    resp = save_command(command, device_ids)
+    return success(resp)
 
 
-@mod.route('/commands/<device_id>/')
+@mod.route('/commands/<int:device_id>/')
 def commands_by_id_view(device_id):
-    """Get command history by device_id.
+    """Get command log by device_id.
     ---
     get:
       tags:
@@ -352,45 +346,6 @@ def commands_by_id_view(device_id):
         5XX:
           description: Unexpected error
     """
-    commands = app.cache.storage.lrange(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + device_id, 0, -1)
-    resp = {DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + device_id: commands}
-
+    resp = get_command_log_by_id(device_id)
     return success(resp)
 
-
-@mod.route('/commands/<device_id>/', methods=['DELETE'])
-def delete_commands_by_id_view(device_id):
-    """Delete command history by device_id.
-    ---
-    delete:
-      tags:
-        - Commands
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties:
-                  type: string
-                example:
-                  commands/id1: {
-                    "info": 0,
-                    "restart": 0,
-                    "restart_device": 0,
-                    "logs": 0
-                  }
-        400:
-          content:
-            application/json:
-              schema: FailSchema
-        5XX:
-          description: Unexpected error
-    """
-    data = {}
-    for command in [s[1] for s in DEVICE.COMMANDS]:
-        num = app.cache.storage.lrem(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + device_id, 0, command)
-        data[command] = num
-    resp = {DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + device_id: data}
-
-    return success(resp)

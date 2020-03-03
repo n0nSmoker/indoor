@@ -58,15 +58,20 @@ def save_contact(instance=None, **kwargs):
 
 def save_command(command, device_ids):
     """
-    Save log on redis_cache
+    Save command for device_ids on redis storage
     """
-    ids = []
+    device_ids = device_ids[0].split(',')
     for i in device_ids:
-        app.cache.storage.rpush(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + str(i), command)
-        ids.append(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + str(i))
-    resp = dict.fromkeys(ids, command)
+        app.cache.storage.rpush(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + i, command)
+    return f"Ok. '{command}' was sent to '{len(device_ids)}' devices."
 
-    return resp
+
+def get_command_log_by_id(device_id):
+    """
+    Get command log by id from redis storage
+    """
+    commands = app.cache.storage.lrange(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + f'{device_id}', 0, -1)
+    return commands
 
 
 def check_token(token):

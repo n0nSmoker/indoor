@@ -1,7 +1,7 @@
 from werkzeug.datastructures import FileStorage
 
 from app.content.utils import save_content
-from app.devices.utils import save_device, save_contact
+from app.devices.utils import save_device, save_contact, save_command
 from app.locations.utils import save_city, save_location
 from app.publishers.utils import save_publisher
 from app.system.utils import save_device_health
@@ -57,4 +57,11 @@ def add_content(created_by, publisher_id, comment=None, status=None):
         created_by=created_by,
         publisher_id=publisher_id,
         status=status,
+    )
+
+
+def add_command(command, device_id):
+    return save_command(
+        command=command,
+        device_ids=[f'{device_id}'],
     )

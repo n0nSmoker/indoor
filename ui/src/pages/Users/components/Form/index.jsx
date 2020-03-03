@@ -26,7 +26,7 @@ export default function Form({ data, handleClose, handleSubmit }) {
       name: data.name,
       email: data.email,
       role: data.role,
-      publisher_id: data.publisher.id,
+      ...(data.publisher ? { publisher_id: data.publisher.id } : {}),
     }
     : {
       role: USERS_ROLE_MANAGER,

@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app as app
+from flask import Blueprint
 from sqlalchemy import or_
 
 from app.locations.models import Location, City
@@ -17,7 +17,6 @@ from .schemas import (
     RegisterDeviceSchema,
     RegisteredDeviceSchema, ContactSchema, AddContactSchema, UpdateContactSchema, SendCommandSchema,)
 from .utils import save_device, save_contact, save_command, get_command_log_by_id
-from . import constants as DEVICE
 
 mod = Blueprint('devices', __name__, url_prefix='/devices')
 
@@ -297,7 +296,7 @@ def send_command_view(command, device_ids):
         - Commands
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema: SendCommandSchema
       responses:
         200:

@@ -63,5 +63,5 @@ def add_content(created_by, publisher_id, comment=None, status=None):
 def add_command(command, device_id):
     return save_command(
         command=command,
-        device_ids=[f'{device_id}'],
+        device_ids=[device_id],
     )

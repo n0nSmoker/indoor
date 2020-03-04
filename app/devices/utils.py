@@ -60,9 +60,8 @@ def save_command(command, device_ids):
     """
     Save command for device_ids on redis storage
     """
-    device_ids = device_ids[0].split(',')
     for i in device_ids:
-        app.cache.storage.rpush(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + i, command)
+        app.cache.storage.rpush(DEVICE.REDIS_KEY + DEVICE.REDIS_KEY_DELIMITER + f'{i}', command)
     return f"Ok. '{command}' was sent to '{len(device_ids)}' devices."
 
 
